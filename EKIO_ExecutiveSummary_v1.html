@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EKIO Bienestar — Executive Summary Mayo 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 8.5pt;
+    color: #2a2a2a;
+    background: #fff;
+    line-height: 1.45;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+
+  /* HEADER */
+  .header {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 10px 16px 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-box {
+    width: 36px;
+    height: 36px;
+    background: #C84B20;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13pt;
+    color: #fff;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+
+  .company-name {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  .company-sub {
+    font-size: 7.5pt;
+    color: #aaa;
+    margin-top: 1px;
+  }
+
+  .tagline {
+    font-size: 8pt;
+    color: #ccc;
+    font-style: italic;
+    text-align: right;
+    max-width: 200px;
+  }
+
+  /* METRICS BAR */
+  .metrics-bar {
+    background: #C84B20;
+    display: flex;
+    gap: 0;
+  }
+
+  .metric-item {
+    flex: 1;
+    padding: 6px 10px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  .metric-item:last-child { border-right: none; }
+
+  .metric-value {
+    font-size: 11pt;
+    font-weight: 700;
+    display: block;
+    line-height: 1.2;
+  }
+
+  .metric-label {
+    font-size: 6.5pt;
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  /* BODY */
+  .body {
+    display: flex;
+    flex: 1;
+  }
+
+  /* LEFT SIDEBAR */
+  .sidebar {
+    width: 64mm;
+    background: #f7f5f2;
+    border-right: 1px solid #e0ddd8;
+    padding: 10px 10px;
+    flex-shrink: 0;
+  }
+
+  /* RIGHT MAIN */
+  .main {
+    flex: 1;
+    padding: 10px 12px;
+  }
+
+  /* SECTION HEADERS */
+  .section-title {
+    font-size: 6.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #C84B20;
+    border-bottom: 1.5px solid #C84B20;
+    padding-bottom: 2px;
+    margin-bottom: 5px;
+    margin-top: 9px;
+  }
+
+  .section-title:first-child { margin-top: 0; }
+
+  /* PROFILE DATA */
+  .profile-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+    border-bottom: 0.5px solid #e8e4e0;
+    font-size: 7.5pt;
+  }
+
+  .profile-row:last-child { border-bottom: none; }
+
+  .profile-label { color: #888; }
+  .profile-value { font-weight: 600; color: #2a2a2a; text-align: right; max-width: 110px; }
+
+  /* STAT BOXES */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .stat-box {
+    background: #fff;
+    border: 0.5px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 6px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #C84B20;
+    display: block;
+    line-height: 1.1;
+  }
+
+  .stat-desc {
+    font-size: 6pt;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  /* INVESTMENT BOX */
+  .invest-box {
+    background: #1a1a1a;
+    color: #fff;
+    border-radius: 5px;
+    padding: 7px 9px;
+    margin-top: 4px;
+  }
+
+  .invest-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+    font-size: 7.5pt;
+    border-bottom: 0.5px solid rgba(255,255,255,0.15);
+  }
+
+  .invest-row:last-child { border-bottom: none; }
+  .invest-label { color: #aaa; }
+  .invest-value { font-weight: 700; color: #fff; }
+  .invest-highlight { color: #C84B20; }
+
+  /* TEAM TABLE */
+  .team-table {
+    width: 100%;
+    font-size: 7pt;
+    border-collapse: collapse;
+  }
+
+  .team-table th {
+    font-size: 6.5pt;
+    color: #888;
+    font-weight: 600;
+    text-align: left;
+    padding: 2px 0;
+    border-bottom: 0.5px solid #ddd;
+  }
+
+  .team-table td {
+    padding: 2.5px 0;
+    border-bottom: 0.5px solid #eee;
+    color: #2a2a2a;
+    vertical-align: top;
+  }
+
+  .team-table tr:last-child td { border-bottom: none; }
+
+  .team-name { font-weight: 600; }
+  .team-role { color: #C84B20; font-size: 6.5pt; }
+
+  /* MAIN CONTENT */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .content-block {
+    margin-bottom: 7px;
+  }
+
+  p {
+    font-size: 7.5pt;
+    color: #444;
+    line-height: 1.5;
+  }
+
+  /* PRODUCT TABLE */
+  .product-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.5pt;
+    margin-top: 3px;
+  }
+
+  .product-table th {
+    font-size: 6.5pt;
+    color: #888;
+    font-weight: 600;
+    text-align: left;
+    padding: 2px 4px;
+    background: #f7f5f2;
+    border: 0.5px solid #e0ddd8;
+  }
+
+  .product-table td {
+    padding: 3px 4px;
+    border: 0.5px solid #e8e4e0;
+    color: #2a2a2a;
+    vertical-align: top;
+  }
+
+  .product-table tr:nth-child(even) td { background: #fdfcfa; }
+  .product-name { font-weight: 700; }
+  .product-price { font-weight: 700; color: #C84B20; }
+  .badge {
+    display: inline-block;
+    background: #fdf0eb;
+    color: #C84B20;
+    border: 0.5px solid #f0b89a;
+    border-radius: 3px;
+    font-size: 5.5pt;
+    padding: 1px 4px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  /* MARKET DATA */
+  .market-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 2.5px 0;
+    border-bottom: 0.5px solid #eee;
+    font-size: 7.5pt;
+  }
+
+  .market-row:last-child { border-bottom: none; }
+  .market-label { color: #666; }
+  .market-value { font-weight: 700; color: #2a2a2a; }
+  .market-accent { color: #C84B20; font-weight: 700; }
+
+  /* CERTIFICATIONS */
+  .cert-row {
+    display: flex;
+    gap: 4px;
+    margin-top: 3px;
+    flex-wrap: wrap;
+  }
+
+  .cert-pill {
+    background: #eaf3de;
+    color: #3B6D11;
+    border: 0.5px solid #c0dd97;
+    border-radius: 3px;
+    font-size: 6pt;
+    padding: 2px 5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  /* TESTIMONIALS */
+  .testimonial {
+    background: #f7f5f2;
+    border-left: 2.5px solid #C84B20;
+    padding: 5px 7px;
+    margin-bottom: 4px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .testimonial p {
+    font-size: 7pt;
+    font-style: italic;
+    color: #444;
+    margin-bottom: 2px;
+  }
+
+  .testimonial-author {
+    font-size: 6.5pt;
+    color: #888;
+    font-weight: 600;
+  }
+
+  /* USE OF FUNDS */
+  .funds-bar {
+    display: flex;
+    height: 10px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 4px 0;
+  }
+
+  .funds-bar div {
+    height: 100%;
+  }
+
+  .funds-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 3px;
+  }
+
+  .funds-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 6.5pt;
+    color: #444;
+  }
+
+  .funds-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* IP BOX */
+  .ip-box {
+    background: #fff8f5;
+    border: 0.5px solid #f0b89a;
+    border-radius: 4px;
+    padding: 5px 7px;
+    margin-top: 3px;
+  }
+
+  .ip-box p { font-size: 7pt; }
+
+  /* CHANNELS */
+  .channel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 3px;
+  }
+
+  .channel-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 6px;
+    background: #fff;
+    border: 0.5px solid #e0ddd8;
+    border-radius: 3px;
+    font-size: 7pt;
+  }
+
+  .channel-name { font-weight: 600; }
+  .channel-detail { color: #888; font-size: 6.5pt; }
+
+  /* FOOTER */
+  .footer {
+    background: #1a1a1a;
+    color: #888;
+    font-size: 6.5pt;
+    padding: 5px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-contact { color: #C84B20; font-weight: 600; }
+
+  /* PHOTO PLACEHOLDER */
+  .photo-placeholder {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0ddd8;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6pt;
+    color: #999;
+    flex-shrink: 0;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .team-row-inner {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* HIGHLIGHT BOX */
+  .highlight-box {
+    background: #fff8f5;
+    border: 1px solid #f0b89a;
+    border-radius: 4px;
+    padding: 5px 8px;
+    margin-top: 4px;
+    font-size: 7.5pt;
+    color: #444;
+  }
+
+  .highlight-box strong { color: #C84B20; }
+
+  @media print {
+    body { margin: 0; }
+    .page { width: 210mm; height: 297mm; margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">E</div>
+      <div>
+        <div class="company-name">EKIO Bienestar</div>
+        <div class="company-sub">Ekio Electrosmog España · ekioelectrosmog.es</div>
+      </div>
+    </div>
+    <div class="tagline">
+      Terapia de luz roja certificada para recuperar la biología humana en entornos modernos
+    </div>
+  </div>
+
+  <!-- METRICS BAR -->
+  <div class="metrics-bar">
+    <div class="metric-item">
+      <span class="metric-value">72.570 €</span>
+      <span class="metric-label">Facturación Ekio Light</span>
+    </div>
+    <div class="metric-item">
+      <span class="metric-value">148</span>
+      <span class="metric-label">Clientes reales</span>
+    </div>
+    <div class="metric-item">
+      <span class="metric-value">~1,8 M€</span>
+      <span class="metric-label">Facturación total empresa</span>
+    </div>
+    <div class="metric-item">
+      <span class="metric-value">~11.000</span>
+      <span class="metric-label">Contactos cualificados</span>
+    </div>
+    <div class="metric-item">
+      <span class="metric-value">370 €</span>
+      <span class="metric-label">Ticket medio actual</span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <div class="section-title">Perfil</div>
+      <div class="profile-row"><span class="profile-label">Sector</span><span class="profile-value">Salud lumínica · Wellness tech</span></div>
+      <div class="profile-row"><span class="profile-label">Actividad clínica</span><span class="profile-value">Desde 2011</span></div>
+      <div class="profile-row"><span class="profile-label">Ekio Bienestar S.L.</span><span class="profile-value">Desde 2020</span></div>
+      <div class="profile-row"><span class="profile-label">E-commerce</span><span class="profile-value">Desde 2023</span></div>
+      <div class="profile-row"><span class="profile-label">Equipo estable</span><span class="profile-value">2 contratados + 6 freelance</span></div>
+      <div class="profile-row"><span class="profile-label">Aceleración</span><span class="profile-value">Wolaria Lanzadera (ICECYL)</span></div>
+      <div class="profile-row"><span class="profile-label">Duración acomp.</span><span class="profile-value">5 años desde ene-2026</span></div>
+      <div class="profile-row"><span class="profile-label">Socio tecnológico</span><span class="profile-value">AIR Institute (IA)</span></div>
+
+      <div class="section-title">Tracción digital</div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <span class="stat-number">~20k</span>
+          <span class="stat-desc">Instagram</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">7.500</span>
+          <span class="stat-desc">Email (Klaviyo)</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">3.500</span>
+          <span class="stat-desc">WhatsApp</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">&gt;50%</span>
+          <span class="stat-desc">Margen bruto</span>
+        </div>
+      </div>
+
+      <div class="section-title">Propuesta de inversión</div>
+      <div class="invest-box">
+        <div class="invest-row"><span class="invest-label">Valoración pre-money</span><span class="invest-value">2.350.000 €</span></div>
+        <div class="invest-row"><span class="invest-label">Inversión solicitada</span><span class="invest-value invest-highlight">350.000 €</span></div>
+        <div class="invest-row"><span class="invest-label">Dilución</span><span class="invest-value">15%</span></div>
+        <div class="invest-row"><span class="invest-label">Valoración post-money</span><span class="invest-value">2.700.000 €</span></div>
+        <div class="invest-row"><span class="invest-label">Runway</span><span class="invest-value">18 meses</span></div>
+        <div class="invest-row"><span class="invest-label">Ronda</span><span class="invest-value">Seed</span></div>
+        <div class="invest-row"><span class="invest-label">Capital propio aportado</span><span class="invest-value">80.000 € (préstamo)</span></div>
+      </div>
+
+      <div class="section-title">Uso de los fondos</div>
+      <div class="funds-bar">
+        <div style="width:50%; background:#C84B20;"></div>
+        <div style="width:25%; background:#e07548;"></div>
+        <div style="width:15%; background:#eaaa80;"></div>
+        <div style="width:10%; background:#f0c9af;"></div>
+      </div>
+      <div class="funds-legend">
+        <div class="funds-legend-item"><div class="funds-dot" style="background:#C84B20;"></div>50% Producción/stock</div>
+        <div class="funds-legend-item"><div class="funds-dot" style="background:#e07548;"></div>25% Marketing EU</div>
+        <div class="funds-legend-item"><div class="funds-dot" style="background:#eaaa80;"></div>15% Software IA</div>
+        <div class="funds-legend-item"><div class="funds-dot" style="background:#f0c9af;"></div>10% Operaciones</div>
+      </div>
+
+      <div class="section-title">Equipo</div>
+      <table class="team-table">
+        <tr>
+          <th>Nombre</th>
+          <th>Rol</th>
+        </tr>
+        <tr>
+          <td>
+            <div class="team-row-inner">
+              <div class="photo-placeholder">📷</div>
+              <div>
+                <div class="team-name">Fco. Javier Andrés</div>
+                <div class="team-role">CEO &amp; Fundador</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:6.5pt; color:#666;">15 años salud lumínica y EMF</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="team-row-inner">
+              <div class="photo-placeholder">📷</div>
+              <div>
+                <div class="team-name">Jesús Bedmar</div>
+                <div class="team-role">PMO</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:6.5pt; color:#666;">Gestión de proyectos y financiero</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="team-row-inner">
+              <div class="photo-placeholder">📷</div>
+              <div>
+                <div class="team-name">Cristian de Moya</div>
+                <div class="team-role">Logística</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:6.5pt; color:#666;">Operaciones y atención al cliente</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="team-row-inner">
+              <div class="photo-placeholder">📷</div>
+              <div>
+                <div class="team-name">Javier Escobar</div>
+                <div class="team-role">TI</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:6.5pt; color:#666;">Tecnología e infraestructura</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="team-row-inner">
+              <div class="photo-placeholder">📷</div>
+              <div>
+                <div class="team-name">Jun</div>
+                <div class="team-role">Meta Ads</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:6.5pt; color:#666;">Experto publicidad Meta</td>
+        </tr>
+      </table>
+
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+      <div class="two-col">
+
+        <!-- LEFT COLUMN -->
+        <div>
+
+          <div class="section-title">El problema</div>
+          <div class="content-block">
+            <p>El ser humano pasa más del 90% de su tiempo en interiores rodeado de iluminación artificial que carece de los espectros biológicamente activos que el organismo necesita: la luz roja e infrarroja del sol. Sin ellos, el ATP mitocondrial no se activa correctamente, el ritmo circadiano se desregula y el sistema inmune se resiente.</p>
+            <p style="margin-top:4px;">La OMS estima que más del 50% de la población tiene déficit de vitamina D. Fatiga, insomnio, inflamación crónica y envejecimiento acelerado son las consecuencias documentadas. Es el mayor problema de salud invisible de la vida moderna.</p>
+          </div>
+
+          <div class="section-title">La solución</div>
+          <div class="content-block">
+            <p>Ekio ha replicado el espectro solar completo dentro del hogar y la oficina. El espectro electromagnético incluye luz: hay un espectro nativo biológico (el solar) y uno artificial que nos perjudica. Ekio Light devuelve al organismo el espectro que necesita mediante fotobiomodulación con hardware multifrecuencia certificado y software de personalización en desarrollo.</p>
+          </div>
+
+          <div class="section-title">Producto — 3 SKUs disponibles hoy</div>
+          <div class="content-block">
+            <table class="product-table">
+              <tr>
+                <th>Modelo</th>
+                <th>PVP</th>
+                <th>Renting</th>
+                <th>Descripción</th>
+              </tr>
+              <tr>
+                <td><span class="product-name">Deep 5</span> <span class="badge">PATENTE</span></td>
+                <td><span class="product-price">650 €</span></td>
+                <td style="font-size:6.5pt; color:#666;">170€ entrada + 25€/mes</td>
+                <td style="font-size:6.5pt; color:#666;">70 LEDs · 5 longitudes de onda</td>
+              </tr>
+              <tr>
+                <td><span class="product-name">Bio Regen 7</span></td>
+                <td><span class="product-price">950 €</span></td>
+                <td style="font-size:6.5pt; color:#666;">250€ entrada + mensualidad</td>
+                <td style="font-size:6.5pt; color:#666;">Panel terapéutico · 7 longitudes de onda</td>
+              </tr>
+              <tr>
+                <td><span class="product-name">Bio Spectrum 10</span> <span class="badge">FLAGSHIP</span></td>
+                <td><span class="product-price">2.500 €</span></td>
+                <td style="font-size:6.5pt; color:#666;">Proporcional</td>
+                <td style="font-size:6.5pt; color:#666;">Premium multifrecuencia · 10 long. de onda</td>
+              </tr>
+            </table>
+            <div class="cert-row">
+              <span class="cert-pill">CE</span>
+              <span class="cert-pill">RoHS</span>
+              <span class="cert-pill">FCC</span>
+              <span class="cert-pill">Reciclaje certificado</span>
+            </div>
+          </div>
+
+          <div class="section-title">Propiedad intelectual</div>
+          <div class="ip-box">
+            <p><strong>Modelo de utilidad registrado:</strong> U202532624. La Bio Spectrum 10 es el producto principal protegido — incluye los modelos de menor gama. Patente internacional en trámite (hardware + software integrado), gestionada por La Fábrica de Inventos (Burgos).</p>
+            <p style="margin-top:3px;"><strong>Segunda patente en proceso:</strong> Sistema de Resonancia Biofotónica Adaptativa (SRBA).</p>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+
+          <div class="section-title">Mercado</div>
+          <div class="content-block">
+            <div class="market-row"><span class="market-label">Mercado europeo terapia luz roja 2025</span><span class="market-value">590 M$</span></div>
+            <div class="market-row"><span class="market-label">Proyección 2031 (CAGR <span class="market-accent">14,2%</span>)</span><span class="market-value">1.320 M$</span></div>
+            <div class="market-row"><span class="market-label">Uso doméstico del mercado global</span><span class="market-value market-accent">44%</span></div>
+            <div class="market-row"><span class="market-label">España — ranking mundial wellness</span><span class="market-value">Puesto 14 / 145 países</span></div>
+            <div class="market-row"><span class="market-label">Mercado fitness España 2025</span><span class="market-value">2.560 M€ · +11,1%</span></div>
+            <div class="market-row"><span class="market-label">Estudios PubMed sobre fotobiomodulación</span><span class="market-value">+5.000 publicados</span></div>
+          </div>
+
+          <div class="section-title">Modelo de negocio</div>
+          <div class="channel-list">
+            <div class="channel-item">
+              <span class="channel-name">D2C e-commerce</span>
+              <span class="channel-detail">Shopify directo · ticket 650–2.500 € · margen &gt;50%</span>
+            </div>
+            <div class="channel-item">
+              <span class="channel-name">Renting suscripción (Sharpei)</span>
+              <span class="channel-detail">Cuota entrada + mensualidad · recurrente · 2 años</span>
+            </div>
+            <div class="channel-item">
+              <span class="channel-name">B2B — Clínicas, gimnasios, hoteles wellness</span>
+              <span class="channel-detail">Ticket 2.000–6.000 € · pipeline identificado</span>
+            </div>
+            <div class="channel-item">
+              <span class="channel-name">Software personalización IA (AIR Institute)</span>
+              <span class="channel-detail">App wearables · Oura Ring / Apple Watch · en desarrollo</span>
+            </div>
+          </div>
+
+          <div class="section-title">Proyecciones financieras</div>
+          <div class="content-block">
+            <div class="market-row"><span class="market-label">Proyección 2026</span><span class="market-value">900.000 €</span></div>
+            <div class="market-row"><span class="market-label">Break-even operativo</span><span class="market-value">Q3 2026</span></div>
+            <div class="market-row"><span class="market-label">Proyección 2027 (B2B + software)</span><span class="market-value">2.500.000 €</span></div>
+          </div>
+
+          <div class="section-title">Clientes — lo que dicen</div>
+          <div class="testimonial">
+            <p>"Llevaba años con insomnio y fatiga. Tras 6 semanas con el Bio Regen 7, duermo mejor y tengo más energía por las mañanas. Es el primer producto de bienestar que noto de verdad."</p>
+            <span class="testimonial-author">— M.T., 44 años, Madrid · Profesional oficina</span>
+          </div>
+          <div class="testimonial">
+            <p>"Como ciclista amateur lo uso para recuperación muscular. El DOMS post-entrenamiento se redujo notablemente desde la tercera semana. Ya no concibo el entrenamiento sin él."</p>
+            <span class="testimonial-author">— A.M., 38 años, Barcelona · Deportista</span>
+          </div>
+          <div class="testimonial">
+            <p>"10 horas diarias frente a pantallas. El Deep 5 en mi despacho ha mejorado mi concentración y reducido el dolor cervical que tenía de forma crónica."</p>
+            <span class="testimonial-author">— C.R., 52 años, Valencia · Directiva</span>
+          </div>
+
+          <div class="highlight-box">
+            <strong>Por qué ahora:</strong> Bryan Johnson, Andrew Huberman y deportistas de élite han convertido la terapia de luz en tendencia mainstream global. El segmento de uso doméstico crece más rápido que el clínico. La siguiente ola es personalización por IA con wearables — exactamente hacia donde se dirige Ekio Light con IP registrada y socio tecnológico confirmado.
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>EKIO Bienestar S.L. · Documento confidencial para inversores · Mayo 2026</span>
+    <span class="footer-contact">Francisco Javier Andrés · <a href="mailto:info@ekioelectrosmog.es" style="color:#C84B20; text-decoration:none;">info@ekioelectrosmog.es</a> · ekioelectrosmog.es</span>
+  </div>
+
+</div>
+</body>
+</html>
