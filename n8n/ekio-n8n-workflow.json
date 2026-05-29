@@ -1,0 +1,434 @@
+{
+  "name": "EKIO — Diagnóstico EHS",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ekio-diagnostico",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "b8e7d62e-5b97-4a36-9078-a01f78d94480",
+      "name": "Webhook EKIO",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        112
+      ],
+      "webhookId": "ekio-diagnostico"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─── EKIO: Preparar payload Klaviyo ───────────────────────────────\n// Recibe el body del formulario y construye los objetos para:\n//   1. Klaviyo Event  (Diagnostico_Completado)\n//   2. IF WhatsApp opt-in → ManyChat\n\nconst body = $input.first().json.body ?? $input.first().json;\n\n// ── Datos básicos ──────────────────────────────────────────────────\nconst email      = (body.email      || '').trim();\nconst nombre     = (body.nombre     || '').trim();\nconst ciudad     = (body.ciudad     || '').trim();\nconst whatsapp   = (body.whatsapp   || '').trim();\nconst wa_opt     = body.wa_opt === true;\nconst score      = Number(body.score_total) || 0;\nconst perfil     = body.perfil      || '';\nconst perfil_slug= body.perfil_slug || '';\nconst nivel      = Number(body.nivel) || 0;\nconst subscores  = body.subscores   || {};\nconst respuestas = body.respuestas  || {};\nconst fecha      = body.fecha       || new Date().toISOString();\n\n// ── Payload para Klaviyo Event + Profile update ────────────────────\n// La API de Klaviyo v2 crea/actualiza el perfil automáticamente\n// cuando se incluyen atributos de perfil dentro del evento.\nconst klaviyoPayload = {\n  data: {\n    type: 'event',\n    attributes: {\n      time: fecha,\n      metric: {\n        data: {\n          type: 'metric',\n          attributes: { name: 'Diagnostico_Completado' }\n        }\n      },\n      profile: {\n        data: {\n          type: 'profile',\n          attributes: {\n            email,\n            first_name: nombre,\n            location: { city: ciudad },\n            properties: {\n              // ─ Resultado del diagnóstico ─\n              score_total:    score,\n              // Alias de compatibilidad con el flow Klaviyo existente (by Erick)\n              Score_TF_EncuestaSensibilidad: score,\n              perfil_ehs:     perfil,\n              perfil_slug:    perfil_slug,\n              nivel_ehs:      nivel,\n              // ─ Contacto adicional ─\n              whatsapp:       whatsapp,\n              ciudad:         ciudad,\n              // ─ Subscores por categoría ─\n              subscore_energia:       subscores.energia       || 0,\n              subscore_sueno:         subscores.sueno         || 0,\n              subscore_emocional:     subscores.emocional     || 0,\n              subscore_piel:          subscores.piel          || 0,\n              subscore_cardiovascular:subscores.cardiovascular|| 0,\n              subscore_digestivo:     subscores.digestivo     || 0,\n              subscore_auditivo:      subscores.auditivo      || 0,\n              subscore_neurologico:   subscores.neurologico   || 0,\n              subscore_visual:        subscores.visual        || 0,\n              subscore_facial:        subscores.facial        || 0,\n              // ─ Respuestas individuales ─\n              ...Object.fromEntries(\n                Object.entries(respuestas).map(([k, v]) => [`resp_${k}`, v])\n              )\n            }\n          }\n        }\n      },\n      properties: {\n        score_total:  score,\n        perfil_ehs:   perfil,\n        perfil_slug:  perfil_slug,\n        nivel_ehs:    nivel,\n        ciudad:       ciudad\n      }\n    }\n  }\n};\n\nreturn [{\n  json: {\n    klaviyoPayload,\n    whatsapp_send: wa_opt && whatsapp.length > 4,\n    whatsapp,\n    nombre,\n    email,\n    score,\n    perfil,\n    perfil_slug,\n    nivel\n  }\n}];"
+      },
+      "id": "e0992dc5-c714-4f01-9dfb-b8f799986f04",
+      "name": "Preparar payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://a.klaviyo.com/api/events/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Klaviyo-API-Key pk_RbTNV3_9278e4524f9cef8910e0f201f89a82ea06"
+            },
+            {
+              "name": "revision",
+              "value": "2023-10-15"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/vnd.api+json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.api+json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/vnd.api+json",
+        "body": "={{ JSON.stringify($json.klaviyoPayload) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "d263a71e-6bf1-4543-a096-74dc8213cf89",
+      "name": "Klaviyo — Crear Evento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "whatsapp-condition",
+              "leftValue": "={{ $('Preparar payload').item.json.whatsapp_send }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b01fedc6-6caf-4ecf-b24d-b3c04755a67f",
+      "name": "¿WhatsApp opt-in?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.manychat.com/fb/subscriber/findByUserRef",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer TU_TOKEN_MANYCHAT"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"phone\": \"{{ $('Preparar payload').item.json.whatsapp }}\",\n  \"name\": \"{{ $('Preparar payload').item.json.nombre }}\",\n  \"custom_fields\": [\n    { \"field_name\": \"score_ehs\",   \"field_value\": \"{{ $('Preparar payload').item.json.score }}\" },\n    { \"field_name\": \"perfil_ehs\",  \"field_value\": \"{{ $('Preparar payload').item.json.perfil }}\" },\n    { \"field_name\": \"nivel_ehs\",   \"field_value\": \"{{ $('Preparar payload').item.json.nivel }}\" },\n    { \"field_name\": \"perfil_slug\", \"field_value\": \"{{ $('Preparar payload').item.json.perfil_slug }}\" }\n  ]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "714c403a-416a-4ff2-b0d8-44024ae7dbdb",
+      "name": "ManyChat — Activar flow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "5883f1cf-17d7-4340-bf9c-fd8b059dbf57",
+      "name": "Sin WhatsApp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        208,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://a.klaviyo.com/api/track",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Klaviyo-API-Key pk_RbTNV3_9278e4524f9cef8910e0f201f89a82ea06"
+            },
+            {
+              "name": "revision",
+              "value": "2023-10-15"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/vnd.api+json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.api+json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"token\": \"Klaviyo-API-Key pk_RbTNV3_9278e4524f9cef8910e0f201f89a82ea06\",\n  \"event\": \"Formulario Cumplimentado\",\n  \"customer_properties\": {\n    \"$email\": \"={{ $('Preparar payload').item.json.email }}\",\n    \"$first_name\": \"={{ $('Preparar payload').item.json.nombre }}\"\n  },\n  \"properties\": {\n    \"formName\": \"Encuesta de Valoración de Sensibilidad a la Contaminación Electromagnética\",\n    \"score_total\": \"={{ $('Preparar payload').item.json.score }}\",\n    \"Score_TF_EncuestaSensibilidad\": \"={{ $('Preparar payload').item.json.score }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -240,
+        112
+      ],
+      "id": "3c1db7b4-91d3-415e-9361-f8e6bc73229c",
+      "name": "Klaviyo — Formulario Cumplimentado"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($('Preparar payload').item.json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        416,
+        0
+      ],
+      "id": "a6039496-f7cf-430d-a45d-62345bf2899c",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "=={{ $('Preparar payload').item.json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        416,
+        224
+      ],
+      "id": "d79e8f66-3c72-4d5b-9667-4f38a0f7241d",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "pinData": {
+    "Webhook EKIO": [
+      {
+        "json": {
+          "headers": {
+            "host": "crm-ekio-n8n.idv05l.easypanel.host",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+            "content-length": "883",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "es-ES,es;q=0.9,en;q=0.8",
+            "content-type": "application/json",
+            "origin": "null",
+            "priority": "u=1, i",
+            "sec-ch-ua": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"macOS\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "95.16.48.38",
+            "x-forwarded-host": "crm-ekio-n8n.idv05l.easypanel.host",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "fcf62f829c22",
+            "x-real-ip": "95.16.48.38"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "nombre": "Jesús Bédmar",
+            "ciudad": "Granada",
+            "email": "bedmar70@gmail.com",
+            "whatsapp": "+34625370894",
+            "wa_opt": true,
+            "score_total": 250,
+            "perfil": "Potencial caso de EHS (Hipersensibilidad Electromagnética)",
+            "perfil_slug": "ehs",
+            "nivel": 5,
+            "subscores": {
+              "energia": 20,
+              "sueno": 10,
+              "emocional": 20,
+              "piel": 20,
+              "cardiovascular": 40,
+              "digestivo": 10,
+              "auditivo": 30,
+              "neurologico": 70,
+              "visual": 10,
+              "facial": 20
+            },
+            "respuestas": {
+              "fatiga": 10,
+              "insomnio": 10,
+              "sueno_exceso": 10,
+              "irritabilidad": 10,
+              "nerviosismo": 10,
+              "piel_erupciones": 10,
+              "taquicardia": 10,
+              "presion_arterial": 10,
+              "colon_irritable": 10,
+              "perdida_auditiva": 10,
+              "dolor_oidos": 10,
+              "tinnitus": 10,
+              "dolor_cejas": 10,
+              "vision_borrosa": 10,
+              "mareo": 10,
+              "concentracion": 10,
+              "memoria": 10,
+              "dolor_cabeza": 10,
+              "enrojecimiento": 10,
+              "calor_rostro": 10,
+              "presion_cabeza": 10,
+              "banda_cabeza": 10,
+              "pinchazos_piel": 10,
+              "presion_pecho": 10,
+              "falta_oxigeno": 10
+            },
+            "fecha": "2026-05-28T19:09:51.522Z"
+          },
+          "webhookUrl": "https://crm-ekio-n8n.idv05l.easypanel.host/webhook/ekio-diagnostico",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook EKIO": {
+      "main": [
+        [
+          {
+            "node": "Preparar payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar payload": {
+      "main": [
+        [
+          {
+            "node": "Klaviyo — Crear Evento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Klaviyo — Crear Evento": {
+      "main": [
+        [
+          {
+            "node": "Klaviyo — Formulario Cumplimentado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿WhatsApp opt-in?": {
+      "main": [
+        [
+          {
+            "node": "ManyChat — Activar flow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sin WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Klaviyo — Formulario Cumplimentado": {
+      "main": [
+        [
+          {
+            "node": "¿WhatsApp opt-in?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ManyChat — Activar flow": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sin WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cb2ecbc8-347b-4c5d-bd6b-edebd221e53c",
+  "meta": {
+    "instanceId": "8af8ad58ceaa7128317f71b54e3ce8551773f7bea5d95541a73fce3fcaa86443"
+  },
+  "id": "ckbdWCJ9DofNSJAw",
+  "tags": [
+    {
+      "updatedAt": "2026-05-28T15:09:38.100Z",
+      "createdAt": "2026-05-28T15:09:38.100Z",
+      "id": "EcZMSgpad5eY3wS3",
+      "name": "diagnostico"
+    },
+    {
+      "updatedAt": "2026-05-28T15:09:38.036Z",
+      "createdAt": "2026-05-28T15:09:38.036Z",
+      "id": "nm6KzNm2OPZvGVnd",
+      "name": "ekio"
+    }
+  ]
+}
