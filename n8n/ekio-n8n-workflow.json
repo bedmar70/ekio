@@ -218,7 +218,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "=={{ $('Preparar payload').item.json }}",
+        "responseBody": "={{ JSON.stringify($('Preparar payload').item.json) }}",
         "options": {
           "responseCode": 200
         }
