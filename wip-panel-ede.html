@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel WIP · Capacidad Operativa — EDE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#07080f;--surface:#0d1120;--surface2:#131929;--border:#1c2640;
+  --text:#ddd8ce;--muted:#5c6a85;--amber:#e8a838;
+  --red:#f87171;--orange:#fb923c;--green:#4ade80;
+  --c-mkt:#a78bfa;--c-ops:#2dd4bf;--c-adm:#fb923c;--c-ia:#38bdf8;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(7,8,15,.96);backdrop-filter:blur(20px);
+  border-bottom:.5px solid var(--border);padding:9px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hdr-logo{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--amber);white-space:nowrap}
+.month-pills{display:flex;gap:4px;flex-wrap:wrap}
+.m-pill{background:transparent;border:.5px solid var(--border);color:var(--muted);padding:4px 11px;
+  border-radius:5px;cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.m-pill:hover{border-color:#263450;color:var(--text)}
+.m-pill.active{border-color:var(--amber);color:var(--amber);background:#1a120844}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.alert-wrap{display:flex;gap:6px}
+.alert-item{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;
+  border:.5px solid;font-size:10px;white-space:nowrap}
+.btn-update{background:transparent;border:.5px solid var(--amber);color:var(--amber);padding:5px 14px;
+  border-radius:6px;cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap}
+.btn-update:hover{background:var(--amber);color:#07080f}
+
+/* MAIN */
+.main{max-width:1160px;margin:0 auto;padding:24px 24px 80px}
+.page-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:#f0ece4;margin-bottom:22px}
+
+/* DEPT SUMMARY */
+.dept-summary{display:grid;grid-template-columns:108px 1fr 1fr 1fr;gap:10px;margin-bottom:18px;align-items:stretch}
+.dept-sum-side{display:flex;align-items:center;justify-content:flex-end;padding-right:4px}
+.dept-sum-side span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:right;line-height:1.5}
+.dept-sum-card{background:var(--surface);border:.5px solid var(--border);border-radius:10px;padding:12px 14px;transition:border-color .3s}
+.dept-sum-name{font-size:10px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;margin-bottom:8px}
+.dept-sum-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:7px}
+.dept-sum-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.dept-sum-stats{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+
+/* DEPT HEADERS */
+.dept-headers{display:grid;grid-template-columns:108px 1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.dept-hdr-cell{text-align:center;padding:6px 10px;border-radius:7px;font-size:9px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;border:.5px solid}
+
+/* LEVEL ROWS */
+.level-row{display:grid;grid-template-columns:108px 1fr;gap:10px;margin-bottom:10px;align-items:start}
+.level-meta{padding-top:14px;text-align:right;padding-right:4px}
+.level-num{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block}
+.level-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--border);display:block;line-height:1.1}
+.cards-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.cards-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* CASCADE */
+.cascade{display:flex;justify-content:center;margin:2px 0 2px 108px}
+.cascade-line{width:1px;height:12px;border-left:1px dashed #1c2640}
+
+/* PERSON CARD */
+.p-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:14px 15px;
+  cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.p-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;opacity:0;transition:opacity .2s}
+.p-card:hover{border-color:#26384e;background:var(--surface2);transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,0,0,.3)}
+.p-card:hover::before{opacity:1}
+.cm-mkt::before{background:var(--c-mkt)}
+.cm-ops::before{background:var(--c-ops)}
+.cm-adm::before{background:var(--c-adm)}
+.cm-all::before{background:var(--amber)}
+.cm-ext::before{background:var(--amber)}
+.cm-ia::before{background:var(--c-ia)}
+
+/* CARD TOP */
+.card-top{display:flex;align-items:flex-start;gap:9px;margin-bottom:11px}
+.card-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;border:.5px solid}
+.card-info{flex:1;min-width:0}
+.card-name{font-size:13px;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-role{font-size:10px;color:var(--muted);margin-top:1px;line-height:1.3}
+.card-hours{font-size:10px;color:var(--muted);margin-top:1px}
+.card-status{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;margin-top:1px}
+.status-dot{width:8px;height:8px;border-radius:50%}
+.status-lbl{font-size:8px;letter-spacing:.04em;text-transform:uppercase}
+
+/* GAUGE */
+.gauge-area{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.gauge-bars{flex:1}
+.gbar-row{display:flex;align-items:center;gap:5px;margin-bottom:5px;font-size:10px}
+.gbar-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.gbar-lbl{color:var(--muted);width:40px;flex-shrink:0}
+.gbar-track{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.gbar-fill{height:100%;border-radius:2px;transition:width .4s}
+.gbar-val{color:var(--muted);width:26px;text-align:right;flex-shrink:0}
+
+/* TASKS */
+.tasks-div{height:.5px;background:var(--border);margin-bottom:8px}
+.task-row{display:flex;align-items:center;gap:5px;margin-bottom:3px;font-size:10px}
+.task-badge{font-size:7px;font-weight:700;letter-spacing:.05em;padding:1px 5px;border-radius:3px;flex-shrink:0}
+.task-badge.proceso{background:#0d202044;color:var(--c-ops);border:.5px solid #1c404044}
+.task-badge.proyecto{background:#1e153544;color:var(--c-mkt);border:.5px solid #3d2a7044}
+.task-name{flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-h{color:var(--muted);flex-shrink:0}
+.opp-cost{margin-top:7px;padding-top:7px;border-top:.5px solid var(--border);display:flex;
+  justify-content:space-between;font-size:10px}
+.opp-lbl{color:var(--muted)}
+.ia-badge{font-size:8px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;
+  border-radius:3px;background:#091520;color:var(--c-ia);border:.5px solid #183040;display:inline-block;margin-bottom:6px}
+
+/* SECTION HR */
+.section-hr{height:.5px;background:var(--border);margin:14px 0;opacity:.4}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;
+  display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:28px;
+  max-width:460px;width:92%;max-height:82vh;overflow-y:auto;transform:translateY(12px);transition:transform .2s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.m-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#f0ece4;margin-bottom:2px}
+.m-role{font-size:12px;color:var(--muted);margin-bottom:22px}
+.m-sec{margin-bottom:18px}
+.m-sec-lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  padding-bottom:8px;border-bottom:.5px solid var(--border);margin-bottom:10px;display:block}
+.m-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0}
+.m-row-lbl{color:var(--muted)}
+.m-row-val{font-weight:500}
+.mload-row{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.mload-lbl{font-size:11px;color:var(--muted);min-width:66px}
+.mload-slider{flex:1;-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;
+  outline:none;cursor:pointer}
+.mload-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:var(--amber);cursor:pointer}
+.mload-val{font-size:11px;color:var(--text);min-width:32px;text-align:right}
+.mload-warn{font-size:11px;min-width:16px;text-align:center}
+.m-close-btn{background:transparent;border:.5px solid var(--border);color:var(--muted);padding:9px 20px;
+  border-radius:8px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;width:100%;
+  margin-top:14px;transition:all .2s}
+.m-close-btn:hover{border-color:var(--amber);color:var(--amber)}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-logo">WIP · EDE</div>
+  <div class="month-pills" id="monthPills"></div>
+  <div class="hdr-right">
+    <div class="alert-wrap" id="alertWrap"></div>
+    <button class="btn-update" id="btnUpdate" onclick="simulateUpdate()">⟳ Actualizar desde ClickUp</button>
+  </div>
+</header>
+
+<main class="main">
+  <div class="page-eyebrow">Escuela de Efectividad — Sistema EDE</div>
+  <div class="page-title">Panel de Capacidad Operativa</div>
+  <div id="mainContent"></div>
+</main>
+
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeFicha()">
+  <div class="modal"><div id="modalContent"></div></div>
+</div>
+
+<script>
+const MONTHS=[
+  {key:'2026-03',label:'Mar 26',days:21},
+  {key:'2026-04',label:'Abr 26',days:22},
+  {key:'2026-05',label:'May 26',days:20},
+  {key:'2026-09',label:'Sep 26',days:22},
+  {key:'2026-11',label:'Nov 26 🛒',days:21},
+];
+
+const PEOPLE=[
+  {id:'carlos',name:'Carlos M.',initials:'CM',role:'CEO · Fundador',level:'ceo',dept:'all',color:'#e8a838',
+   hoursPerDay:8,ratePerHour:null,monthlyHoursCap:null,
+   processLoad:{'2026-03':20,'2026-04':20,'2026-05':20,'2026-09':20,'2026-11':35},
+   tasks:[{name:'Revisión estratégica Q2',type:'proyecto',hours:6},{name:'Comité dirección mensual',type:'proceso',hours:4}]},
+  {id:'laura',name:'Laura G.',initials:'LG',role:'Directora de Operaciones',level:'coo',dept:'all',color:'#e8a838',
+   hoursPerDay:8,ratePerHour:null,monthlyHoursCap:null,
+   processLoad:{'2026-03':25,'2026-04':25,'2026-05':30,'2026-09':30,'2026-11':50},
+   tasks:[{name:'L10 semanal directivo',type:'proceso',hours:8},{name:'Revisión OKRs Q2',type:'proyecto',hours:4},{name:'Onboarding nuevo gerente',type:'proyecto',hours:6}]},
+  {id:'marta',name:'Marta P.',initials:'MP',role:'Responsable Marketing',level:'gerente',dept:'marketing',color:'#a78bfa',
+   hoursPerDay:6,ratePerHour:25,monthlyHoursCap:null,
+   processLoad:{'2026-03':35,'2026-04':35,'2026-05':40,'2026-09':40,'2026-11':65},
+   tasks:[{name:'Gestión RRSS',type:'proceso',hours:8},{name:'Campaña Black Friday',type:'proyecto',hours:12},{name:'Reuniones agencia',type:'proceso',hours:4}]},
+  {id:'sergio',name:'Sergio L.',initials:'SL',role:'Responsable Operaciones',level:'gerente',dept:'operaciones',color:'#2dd4bf',
+   hoursPerDay:8,ratePerHour:22,monthlyHoursCap:null,
+   processLoad:{'2026-03':30,'2026-04':30,'2026-05':35,'2026-09':35,'2026-11':60},
+   tasks:[{name:'Control stock semanal',type:'proceso',hours:10},{name:'Auditoría proveedores',type:'proyecto',hours:8}]},
+  {id:'pilar',name:'Pilar R.',initials:'PR',role:'Responsable Admin',level:'gerente',dept:'admin',color:'#fb923c',
+   hoursPerDay:6,ratePerHour:20,monthlyHoursCap:null,
+   processLoad:{'2026-03':45,'2026-04':45,'2026-05':50,'2026-09':50,'2026-11':65},
+   tasks:[{name:'Ciclo contable mensual',type:'proceso',hours:12},{name:'Solicitud subvención',type:'proyecto',hours:10},{name:'IRPF trimestral',type:'proceso',hours:6}]},
+  {id:'javi',name:'Javi M.',initials:'JM',role:'Marketing & ADS',level:'staff',dept:'marketing',color:'#a78bfa',
+   hoursPerDay:6,ratePerHour:18,monthlyHoursCap:null,
+   processLoad:{'2026-03':40,'2026-04':40,'2026-05':40,'2026-09':40,'2026-11':78},
+   tasks:[{name:'Campañas activas',type:'proceso',hours:10},{name:'Google Ads Q2',type:'proyecto',hours:8}]},
+  {id:'cristian',name:'Cristian V.',initials:'CV',role:'Logística y Envíos',level:'staff',dept:'operaciones',color:'#2dd4bf',
+   hoursPerDay:4,ratePerHour:15,monthlyHoursCap:null,
+   processLoad:{'2026-03':30,'2026-04':30,'2026-05':30,'2026-09':30,'2026-11':90},
+   tasks:[{name:'Distribución pedidos',type:'proceso',hours:8},{name:'Gestión devoluciones',type:'proyecto',hours:3}]},
+  {id:'ana',name:'Ana S.',initials:'AS',role:'Administración',level:'staff',dept:'admin',color:'#fb923c',
+   hoursPerDay:4,ratePerHour:14,monthlyHoursCap:null,
+   processLoad:{'2026-03':40,'2026-04':40,'2026-05':45,'2026-09':45,'2026-11':60},
+   tasks:[{name:'Contabilidad diaria',type:'proceso',hours:10},{name:'Facturas pendientes',type:'proyecto',hours:5}]},
+];
+
+const EXTERNALS=[
+  {id:'consultor',name:'Asesor EDE',initials:'AE',role:'Consultor Externo · 75€/h',level:'externo',dept:null,color:'#e8a838',
+   hoursPerDay:null,ratePerHour:75,monthlyHoursCap:6.67,
+   processLoad:{'2026-03':0,'2026-04':0,'2026-05':0,'2026-09':0,'2026-11':0},
+   tasks:[{name:'Sesión diagnóstico',type:'proyecto',hours:1.5},{name:'Revisión sistema operativo',type:'proyecto',hours:2},{name:'Impl. ciclo OKR',type:'proyecto',hours:1.5}]},
+  {id:'ia-ops',name:'Agente IA · Ops',initials:'AI',role:'Automatización operativa',level:'ia',dept:'operaciones',color:'#38bdf8',
+   hoursPerDay:24,ratePerHour:0.15,monthlyHoursCap:null,
+   processLoad:{'2026-03':0,'2026-04':0,'2026-05':0,'2026-09':0,'2026-11':0},
+   tasks:[{name:'Seguimiento pedidos auto',type:'proceso',hours:60},{name:'FAQs clientes chatbot',type:'proceso',hours:40}]},
+];
+
+const ALL_PEOPLE=[...PEOPLE,...EXTERNALS];
+let currentMonth='2026-05';
+
+// CALCULATIONS
+function getMonth(key){return MONTHS.find(m=>m.key===key)||MONTHS[2]}
+
+function calc(person,mk){
+  const m=getMonth(mk);
+  const totalH=person.monthlyHoursCap!=null?person.monthlyHoursCap:(person.hoursPerDay*m.days);
+  const pLoadPct=person.processLoad[mk]??0;
+  const processH=(pLoadPct/100)*totalH;
+  const taskH=person.tasks.reduce((s,t)=>s+t.hours,0);
+  const usedH=processH+taskH;
+  const pctRaw=totalH>0?usedH/totalH:0;
+  const freeH=Math.max(0,totalH-usedH);
+  const oppCost=(person.ratePerHour&&person.ratePerHour>1)?Math.round(taskH*person.ratePerHour):null;
+  return{
+    totalH:Math.round(totalH*10)/10,
+    pLoadPct,
+    processH:Math.round(processH*10)/10,
+    taskH:Math.round(taskH*10)/10,
+    usedH:Math.round(usedH*10)/10,
+    pctRaw,
+    freeH:Math.round(freeH*10)/10,
+    oppCost,
+  };
+}
+
+function sColor(pct){
+  if(pct>=1.0)return'#f87171';
+  if(pct>=0.80)return'#fb923c';
+  return'#4ade80';
+}
+function sLabel(pct){
+  if(pct>=1.0)return'Saturado';
+  if(pct>=0.80)return'Ajustado';
+  if(pct>=0.5)return'En carga';
+  return'Libre';
+}
+
+// SVG GAUGE ARC
+// Formula verified: endAngle=π*(1-p), x2=cx+r*cos(endAngle), y2=cy-r*sin(endAngle), sweep=1
+function arcPath(cx,cy,r,pct){
+  const p=Math.min(Math.max(pct,0.003),0.997);
+  const ea=Math.PI*(1-p);
+  const x1=cx-r;const y1=cy;
+  const x2=cx+r*Math.cos(ea);const y2=cy-r*Math.sin(ea);
+  return`M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+}
+
+function gaugeSVG(pct,accentColor){
+  const cx=45,cy=46,r=34,sw=7;
+  const sc=pct>=0.8?sColor(pct):accentColor;
+  const disp=Math.round(Math.min(pct,9.99)*100);
+  const bgArc=`M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}`;
+  const fillArc=pct>0.01?arcPath(cx,cy,r,Math.min(pct,1)):null;
+  return`<svg viewBox="0 0 90 52" width="90" height="52" style="display:block">
+    <path d="${bgArc}" fill="none" stroke="#1c2640" stroke-width="${sw}" stroke-linecap="round"/>
+    ${fillArc?`<path d="${fillArc}" fill="none" stroke="${sc}" stroke-width="${sw}" stroke-linecap="round"/>`:''}
+    <text x="${cx}" y="41" text-anchor="middle" fill="${sc}" font-size="14" font-weight="600" font-family="Cormorant Garamond,serif">${disp}%</text>
+    ${pct>=1?`<text x="${cx}" y="50" text-anchor="middle" fill="#f87171" font-size="7" font-family="DM Sans,sans-serif" letter-spacing=".04em">SATURADO</text>`:''}
+  </svg>`;
+}
+
+// CARD
+function dClass(p){
+  if(p.level==='ia')return'cm-ia';
+  if(p.dept==='all'||p.level==='externo')return p.level==='externo'?'cm-ext':'cm-all';
+  if(p.dept==='marketing')return'cm-mkt';
+  if(p.dept==='operaciones')return'cm-ops';
+  return'cm-adm';
+}
+
+function renderCard(person,mk){
+  const c=calc(person,mk);
+  const sc=sColor(c.pctRaw);
+  const dc=dClass(person);
+  const processBarW=Math.min(c.pLoadPct,100);
+  const taskBarW=Math.min((c.taskH/c.totalH)*100,100-processBarW);
+  const freeBarW=Math.max(0,100-processBarW-taskBarW);
+  const isIA=person.level==='ia';
+
+  const tasks=person.tasks.map(t=>`<div class="task-row">
+    <span class="task-badge ${t.type}">${t.type==='proceso'?'PRO':'PYT'}</span>
+    <span class="task-name">${t.name}</span>
+    <span class="task-h">${t.hours}h</span>
+  </div>`).join('');
+
+  return`<div class="p-card ${dc}" onclick="openFicha('${person.id}')">
+    ${isIA?`<div class="ia-badge">Agente IA</div>`:''}
+    <div class="card-top">
+      <div class="card-avatar" style="background:${person.color}1e;color:${person.color};border-color:${person.color}40">
+        ${person.initials}
+      </div>
+      <div class="card-info">
+        <div class="card-name" style="color:${person.color==='#e8a838'?'#f0ece4':person.color}">${person.name}</div>
+        <div class="card-role">${person.role}</div>
+        <div class="card-hours">${person.ratePerHour&&person.ratePerHour>1?person.ratePerHour+'€/h · ':''}${c.totalH}h/mes</div>
+      </div>
+      <div class="card-status">
+        <div class="status-dot" style="background:${sc}"></div>
+        <div class="status-lbl" style="color:${sc}">${sLabel(c.pctRaw)}</div>
+      </div>
+    </div>
+    <div class="gauge-area">
+      <div>${gaugeSVG(c.pctRaw,person.color)}</div>
+      <div class="gauge-bars">
+        <div class="gbar-row">
+          <div class="gbar-dot" style="background:#5c6a85"></div>
+          <div class="gbar-lbl">Proceso</div>
+          <div class="gbar-track"><div class="gbar-fill" style="width:${processBarW}%;background:#5c6a85"></div></div>
+          <div class="gbar-val">${c.pLoadPct}%</div>
+        </div>
+        <div class="gbar-row">
+          <div class="gbar-dot" style="background:${person.color}"></div>
+          <div class="gbar-lbl">Tareas</div>
+          <div class="gbar-track"><div class="gbar-fill" style="width:${Math.min(taskBarW,100)}%;background:${person.color}"></div></div>
+          <div class="gbar-val">${c.taskH}h</div>
+        </div>
+        <div class="gbar-row">
+          <div class="gbar-dot" style="background:${sc}"></div>
+          <div class="gbar-lbl">Libre</div>
+          <div class="gbar-track"><div class="gbar-fill" style="width:${freeBarW}%;background:${c.freeH>0?'#4ade80':'#f87171'}"></div></div>
+          <div class="gbar-val">${c.freeH}h</div>
+        </div>
+      </div>
+    </div>
+    <div class="tasks-div"></div>
+    ${tasks}
+    ${c.oppCost!==null?`<div class="opp-cost"><span class="opp-lbl">Coste oportunidad</span><span style="color:${person.color};font-weight:500">${c.oppCost}€</span></div>`:''}
+  </div>`;
+}
+
+// DEPT SUMMARY
+function renderDeptSummary(mk){
+  const depts=[
+    {id:'marketing',label:'Marketing & Ventas',color:'#a78bfa',icon:'🎯'},
+    {id:'operaciones',label:'Operaciones',color:'#2dd4bf',icon:'⚙️'},
+    {id:'admin',label:'Admin · Finanzas',color:'#fb923c',icon:'💼'},
+  ];
+  const cards=depts.map(d=>{
+    const dp=PEOPLE.filter(p=>p.dept===d.id);
+    const cs=dp.map(p=>calc(p,mk));
+    const totH=cs.reduce((s,c)=>s+c.totalH,0);
+    const usedH=cs.reduce((s,c)=>s+c.usedH,0);
+    const pct=totH>0?usedH/totH:0;
+    const freeH=Math.max(0,totH-usedH);
+    const sc=sColor(pct);
+    return`<div class="dept-sum-card" style="border-color:${d.color}44">
+      <div class="dept-sum-name" style="color:${d.color}">${d.icon} ${d.label}</div>
+      <div class="dept-sum-bar"><div class="dept-sum-fill" style="width:${Math.min(pct*100,100)}%;background:${sc}"></div></div>
+      <div class="dept-sum-stats">
+        <span>${Math.round(pct*100)}% utilizado</span>
+        <span style="color:${freeH>8?'#4ade80':'#fb923c'}">${Math.round(freeH)}h libres</span>
+      </div>
+    </div>`;
+  }).join('');
+  return`<div class="dept-summary">
+    <div class="dept-sum-side"><span>Estado<br>dept.</span></div>${cards}
+  </div>`;
+}
+
+// ALERT BADGE
+function renderAlert(mk){
+  const calcs=ALL_PEOPLE.map(p=>calc(p,mk).pctRaw);
+  const sat=calcs.filter(p=>p>=1).length;
+  const aj=calcs.filter(p=>p>=0.8&&p<1).length;
+  const lib=calcs.filter(p=>p<0.8).length;
+  let html='';
+  if(sat>0)html+=`<div class="alert-item" style="border-color:#f8717155;color:#f87171;background:#2d0f0f88">🔴 ${sat} sat.</div>`;
+  if(aj>0)html+=`<div class="alert-item" style="border-color:#fb923c55;color:#fb923c;background:#2a150688">🟡 ${aj} aj.</div>`;
+  html+=`<div class="alert-item" style="border-color:#4ade8055;color:#4ade80;background:#0a2d1488">🟢 ${lib} lib.</div>`;
+  document.getElementById('alertWrap').innerHTML=html;
+}
+
+// RENDER ALL
+function render(){
+  const mk=currentMonth;
+  const by=id=>PEOPLE.find(p=>p.id===id);
+  const ext=id=>EXTERNALS.find(p=>p.id===id);
+
+  const deptHdrs=`<div class="dept-headers">
+    <div></div>
+    <div class="dept-hdr-cell" style="color:#a78bfa;border-color:#a78bfa44;background:#1e153518">🎯 Marketing & Ventas</div>
+    <div class="dept-hdr-cell" style="color:#2dd4bf;border-color:#2dd4bf44;background:#0d202018">⚙️ Operaciones</div>
+    <div class="dept-hdr-cell" style="color:#fb923c;border-color:#fb923c44;background:#1f120818">💼 Admin · Finanzas</div>
+  </div>`;
+
+  const conn=`<div class="cascade"><div class="cascade-line"></div></div>`;
+
+  const ceoRow=`<div class="level-row">
+    <div class="level-meta"><span class="level-num">Nivel 1</span><span class="level-name">CEO</span></div>
+    <div>${renderCard(by('carlos'),mk)}</div>
+  </div>`;
+
+  const cooRow=`<div class="level-row">
+    <div class="level-meta"><span class="level-num">Nivel 2</span><span class="level-name">COO</span></div>
+    <div>${renderCard(by('laura'),mk)}</div>
+  </div>`;
+
+  const gerRow=`<div class="level-row">
+    <div class="level-meta"><span class="level-num">Nivel 3</span><span class="level-name">Gerentes</span></div>
+    <div class="cards-3">
+      ${renderCard(by('marta'),mk)}${renderCard(by('sergio'),mk)}${renderCard(by('pilar'),mk)}
+    </div>
+  </div>`;
+
+  const staffRow=`<div class="level-row">
+    <div class="level-meta"><span class="level-num">Nivel 4</span><span class="level-name">Staff</span></div>
+    <div class="cards-3">
+      ${renderCard(by('javi'),mk)}${renderCard(by('cristian'),mk)}${renderCard(by('ana'),mk)}
+    </div>
+  </div>`;
+
+  const extRow=`<div class="level-row">
+    <div class="level-meta"><span class="level-num">Ext · IA</span><span class="level-name" style="font-size:14px">Externos</span></div>
+    <div class="cards-2">
+      ${renderCard(ext('consultor'),mk)}${renderCard(ext('ia-ops'),mk)}
+    </div>
+  </div>`;
+
+  document.getElementById('mainContent').innerHTML=
+    renderDeptSummary(mk)+deptHdrs+ceoRow+conn+cooRow+conn+gerRow+conn+staffRow+
+    `<div class="section-hr"></div>`+extRow;
+
+  renderAlert(mk);
+}
+
+// MONTH PILLS
+function renderPills(){
+  document.getElementById('monthPills').innerHTML=MONTHS.map(m=>
+    `<button class="m-pill ${m.key===currentMonth?'active':''}" onclick="setMonth('${m.key}')">${m.label}</button>`
+  ).join('');
+}
+function setMonth(k){currentMonth=k;renderPills();render()}
+
+// MODAL
+function openFicha(personId){
+  const person=ALL_PEOPLE.find(p=>p.id===personId);if(!person)return;
+  const c=calc(person,currentMonth);
+
+  const profileRows=[
+    ['Nivel',{ceo:'CEO',coo:'COO',gerente:'Gerente',staff:'Staff',externo:'Consultor externo',ia:'Agente IA'}[person.level]||person.level],
+    ['Departamento',person.dept==='all'?'Transversal':person.dept===null?'Externo':person.dept],
+    person.hoursPerDay?['Horas/día',`${person.hoursPerDay}h`]:null,
+    person.monthlyHoursCap?['Cap. mensual (retainer)',`${person.monthlyHoursCap.toFixed(1)}h`]:null,
+    person.ratePerHour&&person.ratePerHour>1?['Coste/hora',`${person.ratePerHour}€/h`]:null,
+    ['Total horas mes',`${c.totalH}h`],
+    ['Horas libres',`${c.freeH}h`],
+  ].filter(Boolean).map(([l,v])=>`<div class="m-row"><span class="m-row-lbl">${l}</span><span class="m-row-val">${v}</span></div>`).join('');
+
+  const sliders=MONTHS.map(m=>{
+    const load=person.processLoad[m.key]??0;
+    const vid=`vl_${person.id}_${m.key.replace('-','')}`;
+    const sid=`sl_${person.id}_${m.key.replace('-','')}`;
+    return`<div class="mload-row">
+      <span class="mload-lbl">${m.label}</span>
+      <input type="range" class="mload-slider" id="${sid}" min="0" max="100" value="${load}"
+        oninput="onSlider('${person.id}','${m.key}',this.value,'${vid}')">
+      <span class="mload-val" id="${vid}">${load}%</span>
+      <span class="mload-warn">${load>=70?'⚠️':''}</span>
+    </div>`;
+  }).join('');
+
+  const taskRows=person.tasks.map(t=>`<div class="m-row">
+    <span class="m-row-lbl"><span class="task-badge ${t.type}" style="display:inline-block;margin-right:6px">${t.type==='proceso'?'PRO':'PYT'}</span>${t.name}</span>
+    <span class="m-row-val">${t.hours}h</span>
+  </div>`).join('');
+
+  document.getElementById('modalContent').innerHTML=`
+    <div class="m-name">${person.name}</div>
+    <div class="m-role">${person.role}</div>
+    <div class="m-sec"><span class="m-sec-lbl">Perfil</span>${profileRows}</div>
+    <div class="m-sec">
+      <span class="m-sec-lbl">Carga de proceso por mes · editable</span>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:10px">
+        % del tiempo bloqueado por el proceso recurrente base, antes de asignar tareas.
+      </div>
+      ${sliders}
+    </div>
+    <div class="m-sec">
+      <span class="m-sec-lbl">Tareas activas en ClickUp</span>
+      ${taskRows}
+      <div class="m-row" style="border-top:.5px solid var(--border);margin-top:6px;padding-top:8px">
+        <span class="m-row-lbl">Total tareas</span><span class="m-row-val">${c.taskH}h</span>
+      </div>
+    </div>
+    ${c.oppCost!==null?`<div class="m-sec">
+      <span class="m-sec-lbl">Coste de oportunidad</span>
+      <div class="m-row">
+        <span class="m-row-lbl">${c.taskH}h × ${person.ratePerHour}€/h</span>
+        <span class="m-row-val" style="color:${person.color}">${c.oppCost}€</span>
+      </div>
+    </div>`:''}
+    <button class="m-close-btn" onclick="closeFicha()">Cerrar ficha</button>
+  `;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeFicha(){document.getElementById('modal').classList.remove('open')}
+
+function onSlider(personId,mk,value,vid){
+  const person=ALL_PEOPLE.find(p=>p.id===personId);
+  if(person){
+    person.processLoad[mk]=parseInt(value);
+    document.getElementById(vid).textContent=value+'%';
+    render();
+  }
+}
+
+function simulateUpdate(){
+  const btn=document.getElementById('btnUpdate');
+  btn.textContent='⟳ Conectando con ClickUp…';btn.style.opacity='.6';
+  setTimeout(()=>{
+    btn.textContent='✓ Datos actualizados';
+    setTimeout(()=>{btn.textContent='⟳ Actualizar desde ClickUp';btn.style.opacity='1'},2000);
+  },1300);
+}
+
+window.onload=()=>{renderPills();render()};
+</script>
+</body>
+</html>

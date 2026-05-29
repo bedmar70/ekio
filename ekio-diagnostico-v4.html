@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Diagnóstico de Salud Ambiental | EKIO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --g900: #1B4332;
+      --g700: #2D6A4F;
+      --g500: #40916C;
+      --g300: #52B788;
+      --g100: #B7E4C7;
+      --g50:  #D8F3DC;
+      --text:   #111827;
+      --muted:  #6B7280;
+      --border: #E5E7EB;
+      --bg:     #FFFFFF;
+      --radius: 12px;
+    }
+
+    html, body {
+      height: 100%;
+      background: #F3F4F6;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100%;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ── Progress ── */
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: 4px;
+      background: var(--border);
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--g300);
+      transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── Screen ── */
+    .screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 1.5rem 2.5rem;
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .screen.transitioning {
+      pointer-events: none;
+    }
+
+    /* ── Welcome ── */
+    .ekio-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2.5rem;
+    }
+    .ekio-mark svg { display: block; }
+    .ekio-mark span {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--g700);
+      letter-spacing: -0.01em;
+    }
+
+    .welcome-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--g500);
+      background: var(--g50);
+      border-radius: 100px;
+      padding: 4px 12px;
+      margin-bottom: 1.25rem;
+    }
+    .welcome-title {
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .welcome-sub {
+      font-size: 0.975rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 2.5rem;
+    }
+    .welcome-meta {
+      display: flex;
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+    .meta-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .meta-pill svg { flex-shrink: 0; }
+
+    /* ── Question ── */
+    .q-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--g300);
+      margin-bottom: 1.25rem;
+    }
+    .q-text {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 2.75rem;
+      flex: 1;
+    }
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      padding: 0 2px;
+    }
+    .rating-row {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+    .r-btn {
+      flex: 1;
+      height: 52px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .r-btn:active { transform: scale(0.94); }
+    .r-btn.selected {
+      background: var(--g700);
+      border-color: var(--g700);
+      color: #fff;
+    }
+    .r-btn.pulse {
+      animation: pulse-select 0.25s ease;
+    }
+    @keyframes pulse-select {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(0.88); }
+      100% { transform: scale(1); }
+    }
+
+    /* ── Legal ── */
+    .section-title {
+      font-size: 1.45rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
+    }
+    .section-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .legal-box {
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+    .legal-box a { color: var(--g700); text-decoration: none; }
+    .check-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      margin-bottom: 2.5rem;
+    }
+    .check-label input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      accent-color: var(--g700);
+      cursor: pointer;
+    }
+    .check-label span {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    /* ── Contact ── */
+    .form-row { margin-bottom: 1.1rem; }
+    .form-row label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    .form-row label .opt {
+      font-weight: 400;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .form-row input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.975rem;
+      color: var(--text);
+      background: var(--bg);
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+      outline: none;
+    }
+    .form-row input:focus { border-color: var(--g300); }
+    .form-row input::placeholder { color: #C4C9D4; }
+
+    .wa-opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.83rem;
+      color: var(--muted);
+      cursor: pointer;
+      margin-top: 0.75rem;
+      line-height: 1.4;
+    }
+    .wa-opt input {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      accent-color: var(--g700);
+      cursor: pointer;
+    }
+
+    /* ── Thanks ── */
+    .thanks-check {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--g50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.75rem;
+    }
+    .thanks-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+    .thanks-text {
+      font-size: 0.975rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 2.5rem;
+    }
+    .thanks-text strong { color: var(--text); }
+    .thanks-card {
+      background: var(--g50);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .thanks-card-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--g500);
+      margin-bottom: 0.5rem;
+    }
+    .thanks-card-text {
+      font-size: 0.9rem;
+      color: var(--g900);
+      line-height: 1.6;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 0.975rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      text-align: center;
+      border: none;
+    }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+    .btn-primary {
+      background: var(--g700);
+      color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--g900); }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 0.875rem;
+      border: none;
+      margin-top: 0.75rem;
+    }
+    .btn-ghost:hover { color: var(--text); }
+
+    .bottom { margin-top: auto; padding-top: 2rem; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+  <div class="screen" id="screen"></div>
+</div>
+
+<script>
+/* ── CONFIG ─────────────────────────────────────────── */
+const N8N_WEBHOOK = 'https://crm-ekio-n8n.idv05l.easypanel.host/webhook/ekio-diagnostico'; // ← cambia esto
+
+/* ── PREGUNTAS ──────────────────────────────────────── */
+const QUESTIONS = [
+  { key:'fatiga',             text:'¿En qué medida experimentas fatiga (cansancio general)?' },
+  { key:'insomnio',           text:'¿Con qué frecuencia experimentas problemas para dormir o insomnio?' },
+  { key:'sueno_exceso',       text:'¿Has notado que duermes en exceso?' },
+  { key:'irritabilidad',      text:'¿Cuánto te afecta la irritabilidad a tu bienestar?' },
+  { key:'nerviosismo',        text:'¿Hasta qué punto sientes nerviosismo?' },
+  { key:'piel_erupciones',    text:'¿Has experimentado problemas en la piel, como erupciones o picazón?' },
+  { key:'taquicardia',        text:'¿Cuánto te afecta un ritmo anormal del corazón o taquicardia?' },
+  { key:'presion_arterial',   text:'¿Has experimentado problemas de presión arterial?' },
+  { key:'colon_irritable',    text:'¿Has notado síntomas de síndrome de colon irritable?' },
+  { key:'perdida_auditiva',   text:'¿Has experimentado pérdida auditiva?' },
+  { key:'dolor_oidos',        text:'¿Sientes dolor en los oídos?' },
+  { key:'tinnitus',           text:'¿Qué tan frecuentemente experimentas zumbidos o campanas en los oídos (tinnitus)?' },
+  { key:'dolor_cejas',        text:'¿Has experimentado dolor en las cejas?' },
+  { key:'vision_borrosa',     text:'¿En qué medida te afecta la visión borrosa?' },
+  { key:'mareo',              text:'¿Cuánto nivel de mareo experimentas?' },
+  { key:'concentracion',      text:'¿Has notado problemas de concentración?' },
+  { key:'memoria',            text:'¿Has experimentado problemas de memoria a corto plazo?' },
+  { key:'dolor_cabeza',       text:'¿Has tenido dolores de cabeza?' },
+  { key:'enrojecimiento',     text:'¿Has experimentado enrojecimiento o inflamación facial?' },
+  { key:'calor_rostro',       text:'¿Sientes una sensación de calor en el rostro?' },
+  { key:'presion_cabeza',     text:'¿Has sentido una sensación de presión o adormecimiento en la cabeza?' },
+  { key:'banda_cabeza',       text:'¿Has experimentado una sensación de banda apretada alrededor de la cabeza?' },
+  { key:'pinchazos_piel',     text:'¿Has sentido pinchazos en la piel?' },
+  { key:'presion_pecho',      text:'¿Has experimentado una sensación de presión en el pecho?' },
+  { key:'falta_oxigeno',      text:'¿Has sentido una sensación de falta de oxígeno?' },
+];
+
+/* ── STATE ──────────────────────────────────────────── */
+// Steps: 0=welcome | 1-25=questions | 26=legal | 27=contact | 28=thanks
+let step = 0;
+let answers = {};
+let contact = { nombre:'', ciudad:'', email:'', whatsapp:'', wa_opt: false };
+let legalOk = false;
+let submitting = false;
+
+/* ── LÓGICA ─────────────────────────────────────────── */
+const TOTAL = QUESTIONS.length + 3; // welcome + legal + contact
+
+function progress() {
+  if (step === 0) return 0;
+  if (step >= 28) return 100;
+  return Math.round((step / TOTAL) * 100);
+}
+
+function totalScore() {
+  return Object.values(answers).reduce((s, v) => s + v, 0);
+}
+
+function profile(score) {
+  if (score <= 39)  return { nivel:1, slug:'sin_indicios',    label:'Sin indicios claros de posible EHS' };
+  if (score <= 58)  return { nivel:2, slug:'posible_inicio',  label:'Indicaciones de posible desarrollo de ElectroSensibilidad' };
+  if (score <= 71)  return { nivel:3, slug:'intermitente',    label:'Potencial caso de Electro-Sensibilidad Intermitente' };
+  if (score <= 110) return { nivel:4, slug:'electrosensible', label:'Potencial caso de Electro-Sensibilidad' };
+  return                   { nivel:5, slug:'ehs',             label:'Potencial caso de EHS (Hipersensibilidad Electromagnética)' };
+}
+
+function subscores() {
+  const a = answers;
+  return {
+    energia:       (a.fatiga||0) + (a.sueno_exceso||0),
+    sueno:         (a.insomnio||0),
+    emocional:     (a.irritabilidad||0) + (a.nerviosismo||0),
+    piel:          (a.piel_erupciones||0) + (a.pinchazos_piel||0),
+    cardiovascular:(a.taquicardia||0) + (a.presion_arterial||0) + (a.presion_pecho||0) + (a.falta_oxigeno||0),
+    digestivo:     (a.colon_irritable||0),
+    auditivo:      (a.perdida_auditiva||0) + (a.dolor_oidos||0) + (a.tinnitus||0),
+    neurologico:   (a.dolor_cejas||0) + (a.mareo||0) + (a.concentracion||0) + (a.memoria||0) + (a.dolor_cabeza||0) + (a.presion_cabeza||0) + (a.banda_cabeza||0),
+    visual:        (a.vision_borrosa||0),
+    facial:        (a.enrojecimiento||0) + (a.calor_rostro||0),
+  };
+}
+
+function contactValid() {
+  return contact.nombre.trim() && contact.email.trim() && contact.email.includes('@') && contact.ciudad.trim();
+}
+
+async function postWebhook() {
+  const score = totalScore();
+  const p = profile(score);
+  const payload = {
+    ...contact,
+    score_total: score,
+    perfil: p.label,
+    perfil_slug: p.slug,
+    nivel: p.nivel,
+    subscores: subscores(),
+    respuestas: answers,
+    fecha: new Date().toISOString(),
+  };
+  try {
+    await fetch(N8N_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch(e) { console.warn('Webhook error:', e); }
+}
+
+/* ── RENDER ─────────────────────────────────────────── */
+function html() {
+  if (step === 0) return renderWelcome();
+  if (step >= 1 && step <= 25) return renderQuestion(step - 1);
+  if (step === 26) return renderLegal();
+  if (step === 27) return renderContact();
+  return renderThanks();
+}
+
+function renderWelcome() {
+  return `
+    <div class="ekio-mark">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="#2D6A4F"/>
+        <path d="M7 14 Q14 6 21 14 Q14 22 7 14Z" fill="#52B788"/>
+        <circle cx="14" cy="14" r="3" fill="#fff"/>
+      </svg>
+      <span>EKIO</span>
+    </div>
+    <div class="welcome-tag">Diagnóstico gratuito</div>
+    <h1 class="welcome-title">¿Cuánto te está afectando el entorno electromagnético?</h1>
+    <p class="welcome-sub">25 preguntas sobre tu bienestar. Responde con sinceridad y recibirás un análisis personalizado con recomendaciones adaptadas a tu perfil.</p>
+    <div class="welcome-meta">
+      <div class="meta-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        5 minutos
+      </div>
+      <div class="meta-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        100% privado
+      </div>
+      <div class="meta-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Resultado al email
+      </div>
+    </div>
+    <div class="bottom">
+      <button class="btn btn-primary" onclick="goNext()">Comenzar diagnóstico →</button>
+      <p style="text-align:center;font-size:0.7rem;color:#C4C9D4;margin-top:1rem;">v4 · 28/05/2026 21:06 Madrid</p>
+    </div>`;
+}
+
+function renderQuestion(idx) {
+  const q = QUESTIONS[idx];
+  const sel = answers[q.key];
+  const row1 = [0,1,2,3,4,5];
+  const row2 = [6,7,8,9,10];
+  const btnRow = vals => vals.map(v =>
+    `<button class="r-btn${sel===v?' selected':''}" id="rb${v}" onclick="pick('${q.key}',${v})">${v}</button>`
+  ).join('');
+  return `
+    <p class="q-label">Pregunta ${idx+1} de ${QUESTIONS.length}</p>
+    <p class="q-text">${q.text}</p>
+    <div>
+      <div class="scale-labels"><span>Nada</span><span>Mucho</span></div>
+      <div class="rating-row">${btnRow(row1)}</div>
+      <div class="rating-row">${btnRow(row2)}</div>
+    </div>
+    <div class="bottom">
+      ${step > 1 ? `<button class="btn btn-ghost" onclick="goBack()">← Anterior</button>` : ''}
+    </div>`;
+}
+
+function renderLegal() {
+  return `
+    <h2 class="section-title">Casi listo</h2>
+    <p class="section-sub">Antes de compartir tus datos necesitamos tu consentimiento.</p>
+    <div class="legal-box">
+      Los datos que nos facilites serán tratados por EKIO para enviarte tu resultado y comunicaciones sobre nuestros productos. Puedes ejercer tus derechos de acceso, rectificación y supresión escribiendo a <a href="mailto:info@ekio.es">info@ekio.es</a>. Más información en nuestra <a href="https://ekio.es/privacidad" target="_blank">política de privacidad</a>.
+    </div>
+    <label class="check-label">
+      <input type="checkbox" id="legalChk" ${legalOk?'checked':''} onchange="toggleLegal(this.checked)">
+      <span>Acepto los términos legales y el tratamiento de mis datos personales por parte de EKIO.</span>
+    </label>
+    <div class="bottom">
+      <button class="btn btn-primary" id="legalBtn" onclick="goNext()" ${!legalOk?'disabled':''}>Continuar</button>
+      <button class="btn btn-ghost" onclick="goBack()">← Anterior</button>
+    </div>`;
+}
+
+function renderContact() {
+  const c = contact;
+  return `
+    <h2 class="section-title">¿A dónde enviamos tu resultado?</h2>
+    <p class="section-sub">Recibirás tu diagnóstico personalizado y recomendaciones de forma gratuita.</p>
+    <div class="form-row">
+      <label>Nombre</label>
+      <input type="text" placeholder="Tu nombre" value="${esc(c.nombre)}" oninput="upd('nombre',this.value)">
+    </div>
+    <div class="form-row">
+      <label>Ciudad</label>
+      <input type="text" placeholder="Tu ciudad" value="${esc(c.ciudad)}" oninput="upd('ciudad',this.value)">
+    </div>
+    <div class="form-row">
+      <label>Email</label>
+      <input type="email" placeholder="tu@email.com" value="${esc(c.email)}" oninput="upd('email',this.value)">
+    </div>
+    <div class="form-row">
+      <label>WhatsApp <span class="opt">(opcional)</span></label>
+      <input type="tel" placeholder="+34 600 000 000" value="${esc(c.whatsapp)}" oninput="upd('whatsapp',this.value)">
+    </div>
+    <label class="check-label" style="margin-top:0.25rem; margin-bottom:1.5rem;">
+      <input type="checkbox" id="waOptChk" ${c.wa_opt?'checked':''} onchange="upd('wa_opt',this.checked)">
+      <span style="font-weight:400; color:var(--muted);">Quiero recibir mi resultado también por WhatsApp</span>
+    </label>
+    <div class="bottom">
+      <button class="btn btn-primary" id="submitBtn" onclick="submitForm()" ${!contactValid()?'disabled':''}>
+        ${submitting ? 'Enviando…' : 'Ver mi resultado →'}
+      </button>
+      <button class="btn btn-ghost" onclick="goBack()">← Anterior</button>
+    </div>`;
+}
+
+function renderThanks() {
+  const email = contact.email;
+  const hasWa = contact.whatsapp && contact.wa_opt;
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:1.5rem;">
+      <div class="thanks-check">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M7 16L13 22L25 10" stroke="#2D6A4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="thanks-title">¡Diagnóstico completado!</h1>
+      <p class="thanks-text">Hemos recibido tus respuestas. En breve recibirás tu análisis personalizado en <strong>${esc(email)}</strong>.${hasWa ? '<br><br>También te enviaremos un resumen por WhatsApp.' : ''}</p>
+      <div class="thanks-card" style="text-align:left;width:100%;">
+        <p class="thanks-card-tag">Mientras esperas</p>
+        <p class="thanks-card-text">En EKIO ayudamos a miles de personas a recuperar su bienestar diseñando entornos neurosaludables con tecnología propia. Revisa tu email en los próximos minutos.</p>
+      </div>
+    </div>`;
+}
+
+/* ── ACCIONES ────────────────────────────────────────── */
+function goNext() {
+  if (step < 28) { step++; render(); }
+}
+function goBack() {
+  if (step > 0) { step--; render(); }
+}
+
+function pick(key, val) {
+  answers[key] = val;
+  const btn = document.getElementById('rb' + val);
+  if (btn) btn.classList.add('pulse');
+  setTimeout(goNext, 280);
+}
+
+function toggleLegal(v) {
+  legalOk = v;
+  const b = document.getElementById('legalBtn');
+  if (b) b.disabled = !v;
+}
+
+function upd(field, val) {
+  contact[field] = val;
+  const b = document.getElementById('submitBtn');
+  if (b) b.disabled = !contactValid();
+}
+
+async function submitForm() {
+  if (!contactValid() || submitting) return;
+  submitting = true;
+  const b = document.getElementById('submitBtn');
+  if (b) { b.disabled = true; b.textContent = 'Enviando…'; }
+  await postWebhook();
+  submitting = false;
+  step = 28;
+  render();
+}
+
+function esc(str) {
+  return (str||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+/* ── RENDER ENGINE ───────────────────────────────────── */
+let rendering = false;
+function render() {
+  const fill = document.getElementById('pFill');
+  fill.style.width = progress() + '%';
+
+  const screen = document.getElementById('screen');
+  if (rendering) return;
+  rendering = true;
+
+  // Slide out
+  screen.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+  screen.style.opacity = '0';
+  screen.style.transform = 'translateX(-18px)';
+
+  setTimeout(() => {
+    screen.innerHTML = html();
+    screen.style.transition = 'none';
+    screen.style.transform = 'translateX(18px)';
+    screen.style.opacity = '0';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        screen.style.transition = 'opacity 0.28s ease, transform 0.28s ease';
+        screen.style.opacity = '1';
+        screen.style.transform = 'translateX(0)';
+        rendering = false;
+      });
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 200);
+}
+
+// Boot
+render();
+</script>
+</body>
+</html>
