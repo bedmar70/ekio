@@ -42,7 +42,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Klaviyo-API-Key pk_RbTNV3_9278e4524f9cef8910e0f201f89a82ea06"
+              "value": "Klaviyo-API-Key pk_RbTNV3_5531171c992b3c3830cf91ac1758f55374"
             },
             {
               "name": "revision",
@@ -170,7 +170,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Klaviyo-API-Key pk_RbTNV3_9278e4524f9cef8910e0f201f89a82ea06"
+              "value": "Klaviyo-API-Key pk_RbTNV3_5531171c992b3c3830cf91ac1758f55374"
             },
             {
               "name": "revision",
@@ -188,7 +188,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"token\": \"Klaviyo-API-Key pk_RbTNV3_9278e4524f9cef8910e0f201f89a82ea06\",\n  \"event\": \"Formulario Cumplimentado\",\n  \"customer_properties\": {\n    \"$email\": \"={{ $('Preparar payload').item.json.email }}\",\n    \"$first_name\": \"={{ $('Preparar payload').item.json.nombre }}\"\n  },\n  \"properties\": {\n    \"formName\": \"Encuesta de Valoración de Sensibilidad a la Contaminación Electromagnética\",\n    \"score_total\": \"={{ $('Preparar payload').item.json.score }}\",\n    \"Score_TF_EncuestaSensibilidad\": \"={{ $('Preparar payload').item.json.score }}\"\n  }\n}",
+        "jsonBody": "={\n  \"token\": \"Klaviyo-API-Key pk_RbTNV3_5531171c992b3c3830cf91ac1758f55374\",\n  \"event\": \"Formulario Cumplimentado\",\n  \"customer_properties\": {\n    \"$email\": \"={{ $('Preparar payload').item.json.email }}\",\n    \"$first_name\": \"={{ $('Preparar payload').item.json.nombre }}\"\n  },\n  \"properties\": {\n    \"formName\": \"Encuesta de Valoración de Sensibilidad a la Contaminación Electromagnética\",\n    \"score_total\": \"={{ $('Preparar payload').item.json.score }}\",\n    \"Score_TF_EncuestaSensibilidad\": \"={{ $('Preparar payload').item.json.score }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
