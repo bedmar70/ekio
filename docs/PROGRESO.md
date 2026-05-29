@@ -98,7 +98,7 @@ Pendiente: clonar flow "by EDE" en "TEST n8n" + integracion ManyChat.
 
 | Servicio | URL |
 |---------|-----|
-| Formulario (Vercel) | https://ekio-formulario.vercel.app |
+| Formulario (Vercel) | https://ekio-klaviyo-n8n.vercel.app |
 | n8n instancia | https://crm-ekio-n8n.idv05l.easypanel.host |
 | Webhook n8n | https://crm-ekio-n8n.idv05l.easypanel.host/webhook/ekio-diagnostico |
 | Klaviyo flow origen | https://www.klaviyo.com/flow/RQ83ti |

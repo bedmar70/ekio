@@ -33,7 +33,7 @@ ekio-formulario/
 
 El fichero `form/ekio-diagnostico-v4.html` está desplegado en Vercel con deploy automático en cada push a `main`.
 
-**URL de producción:** https://ekio-formulario.vercel.app
+**URL de producción:** https://ekio-klaviyo-n8n.vercel.app
 
 ### n8n (workflow)
 
