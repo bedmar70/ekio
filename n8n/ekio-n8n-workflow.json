@@ -36,6 +36,52 @@
     {
       "parameters": {
         "method": "POST",
+        "url": "https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Klaviyo-API-Key pk_RbTNV3_5531171c992b3c3830cf91ac1758f55374"
+            },
+            {
+              "name": "revision",
+              "value": "2023-10-15"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/vnd.api+json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.api+json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/vnd.api+json",
+        "body": "={{ JSON.stringify({ data: { type: 'profile-subscription-bulk-create-job', attributes: { list_id: 'S523PV', subscriptions: [{ email: $json.email, channels: { email: { marketing: { consent: 'SUBSCRIBED' } } } }] } } }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+      "name": "Klaviyo — Suscribir a Lista",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -552,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
         "url": "https://a.klaviyo.com/api/events/",
         "sendHeaders": true,
         "headerParameters": {
@@ -61,7 +107,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/vnd.api+json",
-        "body": "={{ JSON.stringify($json.klaviyoPayload) }}",
+        "body": "={{ JSON.stringify($('Preparar payload').item.json.klaviyoPayload) }}",
         "options": {
           "response": {
             "response": {
@@ -335,6 +381,17 @@
       ]
     },
     "Preparar payload": {
+      "main": [
+        [
+          {
+            "node": "Klaviyo — Suscribir a Lista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Klaviyo — Suscribir a Lista": {
       "main": [
         [
           {
