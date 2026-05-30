@@ -2,18 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "form/ekio-diagnostico-v4.html",
+      "src": "form/ekio-diagnostico-v5.html",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/",
-      "dest": "/form/ekio-diagnostico-v4.html"
+      "dest": "/form/ekio-diagnostico-v5.html"
     },
     {
       "src": "/diagnostico",
-      "dest": "/form/ekio-diagnostico-v4.html"
+      "dest": "/form/ekio-diagnostico-v5.html"
     }
   ]
 }
