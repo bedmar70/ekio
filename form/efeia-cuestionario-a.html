@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cuestionario A — Hábitos Tecnológicos · EFEIA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue:    #3B49DF;
+      --blue-dk: #2A37C8;
+      --text:    #111827;
+      --muted:   #6B7280;
+      --border:  #E5E7EB;
+      --bg-page: #F3F4F6;
+      --bg-card: #FFFFFF;
+      --radius:  16px;
+    }
+    html, body { height: 100%; background: var(--bg-page); font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    .page { display: flex; flex-direction: column; padding: 24px 16px 40px; max-width: 600px; margin: 0 auto; }
+    .page-title { font-size: 2rem; font-weight: 700; color: var(--text); letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 20px; }
+    .card { background: var(--bg-card); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.07), 0 0 1px rgba(0,0,0,0.06); overflow: hidden; }
+    .progress-bar { height: 3px; background: var(--border); }
+    .progress-fill { height: 100%; background: var(--blue); transition: width 0.45s cubic-bezier(0.4,0,0.2,1); }
+    .screen { display: flex; flex-direction: column; padding: 28px 24px 24px; }
+
+    /* Welcome */
+    .welcome-logo { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; }
+    .welcome-logo span { font-size: 0.95rem; font-weight: 700; color: var(--text); letter-spacing: 0.04em; }
+    .welcome-desc { font-size: 0.97rem; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+    .welcome-meta { font-size: 0.82rem; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-top: 12px; }
+
+    /* Question header */
+    .q-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+    .q-badge { width: 28px; height: 28px; min-width: 28px; background: var(--blue); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; color: #fff; margin-top: 2px; }
+    .q-text { font-size: 1.05rem; font-weight: 500; color: var(--text); line-height: 1.55; flex: 1; }
+
+    /* Option list (radio / checkbox) */
+    .opt-list { display: flex; flex-direction: column; gap: 8px; }
+    .opt-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; background: #F9FAFB; cursor: pointer; transition: border-color 0.12s, background 0.12s; font-size: 0.9rem; color: var(--text); line-height: 1.4; -webkit-tap-highlight-color: transparent; user-select: none; }
+    .opt-item:active { transform: scale(0.99); }
+    .opt-item.selected { background: #EEF0FD; border-color: var(--blue); color: var(--blue); font-weight: 600; }
+    .opt-marker { width: 20px; height: 20px; min-width: 20px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color 0.12s, background 0.12s; }
+    .opt-item.selected .opt-marker { border-color: var(--blue); background: var(--blue); }
+    .opt-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+    .chk-marker { width: 20px; height: 20px; min-width: 20px; border-radius: 5px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color 0.12s, background 0.12s; }
+    .opt-item.selected .chk-marker { border-color: var(--blue); background: var(--blue); }
+
+    /* Yes/No */
+    .yesno-row { display: flex; gap: 10px; }
+    .yesno-btn { flex: 1; padding: 14px; border: 1.5px solid var(--border); border-radius: 10px; background: #F9FAFB; font-family: inherit; font-size: 1rem; font-weight: 600; color: var(--text); cursor: pointer; transition: border-color 0.12s, background 0.12s, color 0.12s; -webkit-tap-highlight-color: transparent; text-align: center; }
+    .yesno-btn.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .yesno-btn:active { transform: scale(0.97); }
+
+    /* Scale */
+    .scale-labels { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); margin-bottom: 8px; }
+    .scale-row { display: flex; gap: 6px; }
+    .s-btn { flex: 1; height: 50px; border: 1.5px solid var(--border); border-radius: 10px; background: #F9FAFB; font-family: inherit; font-size: 0.95rem; font-weight: 500; color: var(--text); cursor: pointer; transition: border-color 0.12s, background 0.12s, color 0.12s; -webkit-tap-highlight-color: transparent; }
+    .s-btn.selected { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
+    .s-btn:active { transform: scale(0.92); }
+
+    /* Text inputs */
+    .field-textarea { width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.95rem; color: var(--text); background: var(--bg-card); resize: none; outline: none; line-height: 1.6; transition: border-color 0.18s; }
+    .field-textarea:focus { border-color: var(--blue); }
+    .field-textarea::placeholder { color: #C4C9D4; }
+    .field-text { width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.95rem; color: var(--text); background: var(--bg-card); outline: none; transition: border-color 0.18s; -webkit-appearance: none; }
+    .field-text:focus { border-color: var(--blue); }
+    .field-text::placeholder { color: #C4C9D4; }
+
+    /* Bottom */
+    .bottom { margin-top: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-arrows { display: flex; gap: 6px; }
+    .nav-btn { width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid var(--border); background: #F9FAFB; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.12s; color: var(--muted); }
+    .nav-btn:hover { background: var(--border); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 0.85rem 1.75rem; border-radius: 10px; font-family: inherit; font-size: 0.975rem; font-weight: 600; cursor: pointer; transition: background 0.15s, opacity 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent; border: none; white-space: nowrap; }
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--blue-dk); }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Legal */
+    .section-title { font-size: 1.45rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-bottom: 6px; }
+    .section-sub { font-size: 0.9rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+    .legal-box { background: #F9FAFB; border: 1px solid var(--border); border-radius: 10px; padding: 16px; font-size: 0.84rem; color: var(--muted); line-height: 1.65; margin-bottom: 20px; }
+    .legal-box a { color: var(--blue); text-decoration: none; }
+    .check-label { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; margin-bottom: 24px; }
+    .check-label input[type="checkbox"] { width: 20px; height: 20px; min-width: 20px; flex-shrink: 0; margin-top: 1px; accent-color: var(--blue); cursor: pointer; }
+    .check-label span { font-size: 0.9rem; color: var(--text); line-height: 1.55; }
+
+    /* Contact */
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+    .form-row .opt { font-weight: 400; color: var(--muted); }
+    .form-row input { width: 100%; padding: 0.85rem 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.975rem; color: var(--text); background: var(--bg-card); transition: border-color 0.18s; -webkit-appearance: none; outline: none; }
+    .form-row input:focus { border-color: var(--blue); }
+    .form-row input::placeholder { color: #C4C9D4; }
+
+    /* Thanks */
+    .thanks-icon { width: 64px; height: 64px; border-radius: 50%; background: #EEF0FD; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+    .thanks-title { font-size: 1.5rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-bottom: 10px; }
+    .thanks-text { font-size: 0.95rem; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
+    .thanks-text strong { color: var(--text); }
+    .thanks-card { background: #F0F1FD; border-radius: 12px; padding: 20px; }
+    .thanks-card-tag { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+    .thanks-card-text { font-size: 0.88rem; color: #374151; line-height: 1.6; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <h1 class="page-title" id="pageTitle">Cuestionario A</h1>
+  <div class="card">
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    <div class="screen" id="screen"></div>
+  </div>
+</div>
+
+<script>
+const N8N_WEBHOOK = 'https://crm-ekio-n8n.idv05l.easypanel.host/webhook/efeia-cuestionario-a';
+
+const QUESTIONS = [
+  { num:1,  key:'uso_tecnologia',       type:'textarea', required:false,
+    text:'Por favor, cuéntanos cómo usas tu teléfono móvil y otras tecnologías de uso personal.',
+    placeholder:'Escribe tu respuesta aquí…' },
+
+  { num:2,  key:'modelo_movil',         type:'radio',
+    text:'Indica el modelo de tu teléfono móvil:',
+    opts:[
+      {v:'apple',   l:'Apple (iPhone)'},
+      {v:'xiaomi',  l:'Xiaomi'},
+      {v:'samsung', l:'Samsung'},
+      {v:'huawei',  l:'Huawei'},
+      {v:'otro',    l:'Otro'}
+    ]},
+
+  { num:3,  key:'patron_uso',           type:'radio',
+    text:'Indica con cuál frase te identificas más con tu uso del teléfono:',
+    opts:[
+      {v:'minimo',      l:'Uso el teléfono solo para enviar mensajes pocas veces al día'},
+      {v:'modo_avion',  l:'Mi teléfono normalmente está en modo avión y con el wifi desactivado cuando no lo uso'},
+      {v:'todo_el_dia', l:'Lo uso durante todo el día para leer y enviar mensajes, redes sociales y WhatsApp'},
+      {v:'intensivo',   l:'Uso el teléfono todo el día, hago llamadas frecuentes y lo tengo siempre encendido cerca'}
+    ]},
+
+  { num:4,  key:'habito_dormir',        type:'radio',
+    text:'Cuando te vas a dormir, ¿qué describe mejor tu hábito con el teléfono?',
+    opts:[
+      {v:'apago',        l:'Apago el teléfono y no lo reviso hasta la mañana siguiente'},
+      {v:'redes_dormir', l:'Me gusta revisar redes sociales o ver un vídeo antes de dormir, luego lo apago'},
+      {v:'encendido',    l:'Pongo el teléfono a mi lado encendido por si hay alguna emergencia'}
+    ]},
+
+  { num:5,  key:'sensacion_llamada',    type:'radio',
+    text:'Cuando haces una llamada telefónica de más de un minuto…',
+    opts:[
+      {v:'mareo',            l:'Sientes mareo'},
+      {v:'molestia_oreja',   l:'Te da una leve molestia en la zona de la oreja'},
+      {v:'puyazos',          l:'Sientes puyazos en la cabeza'},
+      {v:'quieres_terminar', l:'No sientes nada, pero te dan ganas de finalizar la llamada pronto'},
+      {v:'te_gusta',         l:'No sientes nada, te gusta hablar y podrías estar mucho tiempo al teléfono'}
+    ]},
+
+  { num:6,  key:'conoce_horas_pantalla', type:'yesno',
+    text:'¿Conoces cuántas horas de visualización de pantallas electrónicas tienes por semana?' },
+
+  { num:7,  key:'horas_pantalla_semana', type:'text', required:false,
+    text:'Indica cuántas horas de visualización de pantallas tienes por semana:',
+    placeholder:'Ej: 20 horas',
+    showIf:() => answers['conoce_horas_pantalla'] === 'si' },
+
+  { num:8,  key:'gafas_lectura',        type:'yesno',
+    text:'¿Usas lentes o gafas para lectura o ver de lejos?' },
+
+  { num:9,  key:'gafas_sol',            type:'yesno',
+    text:'¿Usas lentes o gafas de sol para protegerte del sol?' },
+
+  { num:10, key:'gafas_luz_azul',       type:'yesno',
+    text:'¿Usas lentes o gafas de bloqueo de luz azul?' },
+
+  { num:11, key:'grounding_practica',   type:'yesno',
+    text:'¿Conoces el Grounding? ¿Lo practicas?' },
+
+  { num:12, key:'grounding_frecuencia', type:'radio',
+    text:'¿Con cuánta frecuencia haces grounding?',
+    showIf:() => answers['grounding_practica'] === 'si',
+    opts:[
+      {v:'diario',        l:'Diariamente'},
+      {v:'varios_semana', l:'Algunos días en la semana'},
+      {v:'fines_semana',  l:'Los fines de semana'},
+      {v:'semanal',       l:'Un día por semana'},
+      {v:'rara_vez',      l:'Rara vez'}
+    ]},
+
+  { num:13, key:'deporte_aire_libre',   type:'textarea', required:false,
+    text:'¿Realizas algún deporte o ejercicio al aire libre? Si es así, ¿cuál practicas?',
+    placeholder:'Escribe tu respuesta aquí…' },
+
+  { num:14, key:'le_gusta_naturaleza',  type:'yesno',
+    text:'¿Te gusta pasear en la naturaleza: bosque, montañas, playas?' },
+
+  { num:15, key:'frecuencia_naturaleza', type:'radio',
+    text:'¿Con cuánta frecuencia visitas estos lugares naturales?',
+    opts:[
+      {v:'par_veces_anyo', l:'Un par de veces al año'},
+      {v:'mensual',        l:'Mensualmente'},
+      {v:'fines_semana',   l:'Todos los fines de semana'},
+      {v:'diario',         l:'A diario'}
+    ]},
+
+  { num:16, key:'historial_alergias',   type:'textarea', required:false,
+    text:'¿Tienes historial de alergias y sensibilidades múltiples? Cuéntanos más.',
+    placeholder:'Ej: Alergia al polen, piel atópica…' },
+
+  { num:17, key:'sensibilidad_ruido',   type:'scale', min:0, max:7,
+    text:'¿Eres sensible a ruidos y/o sonidos? Indica tu nivel del 0 al 7.',
+    labelMin:'Nada sensible', labelMax:'Muy sensible' },
+
+  { num:18, key:'sensible_sol',         type:'yesno',
+    text:'¿Eres sensible al sol o a mucha luminosidad?' },
+
+  { num:19, key:'sensible_estaciones',  type:'yesno',
+    text:'¿Eres sensible a los cambios de estación?' },
+
+  { num:20, key:'alergias_piel',        type:'yesno',
+    text:'¿Tienes alergias múltiples en la piel o reacciones alérgicas con frecuencia?' },
+
+  { num:21, key:'alergia_tipos',        type:'checkbox',
+    text:'Eres alérgico a: (puedes seleccionar varias)',
+    opts:[
+      {v:'polen',        l:'Polen o ácaros'},
+      {v:'latex',        l:'Látex'},
+      {v:'metales',      l:'Metales (níquel u otros)'},
+      {v:'medicamentos', l:'Medicamentos'},
+      {v:'ninguno',      l:'Ninguno de los anteriores'}
+    ]},
+
+  { num:22, key:'sensibilidad_tipos',   type:'checkbox',
+    text:'Eres sensible a: (puedes seleccionar varias)',
+    opts:[
+      {v:'perfumes', l:'Algunos perfumes o lociones'},
+      {v:'gluten',   l:'Gluten'},
+      {v:'ninguno',  l:'Ninguno de los anteriores'}
+    ]},
+
+  { num:23, key:'intolerante_lactosa',   type:'yesno',
+    text:'¿Eres intolerante a la lactosa?' },
+
+  { num:24, key:'intolerante_sorbitol',  type:'yesno',
+    text:'¿Eres intolerante al sorbitol?' },
+
+  { num:25, key:'intolerante_histamina', type:'yesno',
+    text:'¿Eres intolerante a la histamina o sufres de deficiencia de DAO?' }
+];
+
+let step = 0;
+let answers = {};
+let contact = { nombre:'', email:'', whatsapp:'', wa_opt:false };
+let legalOk = false;
+let submitting = false;
+
+function vqs() { return QUESTIONS.filter(q => !q.showIf || q.showIf()); }
+function ts()  { return vqs().length + 3; }  // +welcome +legal +contact (thanks = ts)
+
+function progress() {
+  if (step === 0) return 0;
+  if (step >= ts()) return 100;
+  return Math.round((step / ts()) * 100);
+}
+
+function answered(q) {
+  if (q.required === false) return true;
+  const a = answers[q.key];
+  if (q.type === 'checkbox') return Array.isArray(a) && a.length > 0;
+  if (q.type === 'scale')    return a !== undefined;
+  return a !== undefined && a !== '';
+}
+
+function contactValid() {
+  return contact.nombre.trim() && contact.email.trim() && contact.email.includes('@');
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── Navigation ── */
+function goNext() { if (step < ts()) { step++; draw(); } }
+function goBack() { if (step > 0)    { step--; draw(); } }
+
+function pickRadio(key, val) {
+  answers[key] = val;
+  draw();
+  setTimeout(goNext, 220);
+}
+function pickYesNo(key, val) {
+  answers[key] = val;
+  draw();
+  setTimeout(goNext, 220);
+}
+function pickScale(key, val) {
+  answers[key] = val;
+  draw();
+}
+function toggleChk(key, val) {
+  if (!Array.isArray(answers[key])) answers[key] = [];
+  const arr = answers[key];
+  if (val === 'ninguno') {
+    answers[key] = arr.includes('ninguno') ? [] : ['ninguno'];
+  } else {
+    const ni = arr.indexOf('ninguno');
+    if (ni !== -1) arr.splice(ni, 1);
+    const i = arr.indexOf(val);
+    if (i === -1) arr.push(val); else arr.splice(i, 1);
+  }
+  draw();
+}
+function updC(f, v) {
+  contact[f] = v;
+  const b = document.getElementById('submitBtn');
+  if (b) b.disabled = !contactValid();
+}
+function toggleLegal(v) {
+  legalOk = v;
+  const b = document.getElementById('legalBtn');
+  if (b) b.disabled = !legalOk;
+}
+
+/* ── Submit ── */
+async function submitForm() {
+  if (submitting || !contactValid()) return;
+  submitting = true;
+  draw();
+  try {
+    await fetch(N8N_WEBHOOK, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ ...contact, respuestas: answers, fecha: new Date().toISOString() })
+    });
+  } catch(e) { console.warn('Webhook error:', e); }
+  step = ts() + 1;
+  draw();
+}
+
+/* ── RENDER ── */
+function draw() {
+  document.getElementById('pFill').style.width = progress() + '%';
+  const t = ts();
+  let h = '';
+  if      (step === 0)      h = renderWelcome();
+  else if (step <= t - 3)   h = renderQuestion();
+  else if (step === t - 2)  h = renderLegal();
+  else if (step === t - 1)  h = renderContact();
+  else                      h = renderThanks();
+  document.getElementById('screen').innerHTML = h;
+  const title = document.getElementById('pageTitle');
+  title.textContent = step >= t ? '¡Gracias!' : 'Cuestionario A';
+  window.scrollTo(0, 0);
+}
+
+function renderWelcome() {
+  return `
+    <div class="welcome-logo">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="#3B49DF"/>
+        <path d="M7 9h14M7 14h10M7 19h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>EFEIA</span>
+    </div>
+    <p class="welcome-desc">
+      <strong>Cuestionario A — Hábitos de uso de la tecnología</strong><br><br>
+      Este cuestionario nos ayuda a conocer tus hábitos tecnológicos y su posible relación con tu sensibilidad electromagnética.<br><br>
+      No hay respuestas correctas ni incorrectas. Responde con sinceridad según tu experiencia habitual.
+    </p>
+    <div class="bottom" style="flex-direction:column;gap:10px;align-items:flex-start;">
+      <button class="btn btn-primary" onclick="goNext()">Comenzar</button>
+      <div class="welcome-meta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Aproximadamente 5 minutos
+      </div>
+    </div>`;
+}
+
+function renderQuestion() {
+  const list = vqs();
+  const idx  = step - 1;
+  const q    = list[idx];
+  if (!q) return '';
+
+  const ok   = answered(q);
+  const auto = q.type === 'radio' || q.type === 'yesno';
+  let body   = '';
+
+  if (q.type === 'radio') {
+    const sel = answers[q.key];
+    body = `<div class="opt-list">` + q.opts.map(o => `
+      <div class="opt-item${sel===o.v?' selected':''}" onclick="pickRadio('${q.key}','${o.v}')">
+        <div class="opt-marker"><div class="opt-dot"></div></div>
+        <span>${esc(o.l)}</span>
+      </div>`).join('') + `</div>`;
+
+  } else if (q.type === 'yesno') {
+    const sel = answers[q.key];
+    body = `<div class="yesno-row">
+      <button class="yesno-btn${sel==='si'?' selected':''}" onclick="pickYesNo('${q.key}','si')">Sí</button>
+      <button class="yesno-btn${sel==='no'?' selected':''}" onclick="pickYesNo('${q.key}','no')">No</button>
+    </div>`;
+
+  } else if (q.type === 'textarea') {
+    body = `<textarea class="field-textarea" rows="4" placeholder="${esc(q.placeholder)}" oninput="answers['${q.key}']=this.value">${esc(answers[q.key]||'')}</textarea>`;
+
+  } else if (q.type === 'text') {
+    body = `<input class="field-text" type="text" placeholder="${esc(q.placeholder)}" value="${esc(answers[q.key]||'')}" oninput="answers['${q.key}']=this.value">`;
+
+  } else if (q.type === 'scale') {
+    const sel = answers[q.key];
+    const btns = [];
+    for (let i = q.min; i <= q.max; i++)
+      btns.push(`<button class="s-btn${sel===i?' selected':''}" onclick="pickScale('${q.key}',${i})">${i}</button>`);
+    body = `
+      <div class="scale-labels"><span>${esc(q.labelMin)}</span><span>${esc(q.labelMax)}</span></div>
+      <div class="scale-row">${btns.join('')}</div>`;
+
+  } else if (q.type === 'checkbox') {
+    const sel = answers[q.key] || [];
+    body = `<div class="opt-list">` + q.opts.map(o => {
+      const chk = sel.includes(o.v);
+      return `<div class="opt-item${chk?' selected':''}" onclick="toggleChk('${q.key}','${o.v}')">
+        <div class="chk-marker">${chk?'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+        <span>${esc(o.l)}</span>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+
+  const isLast = idx === list.length - 1;
+  return `
+    <div class="q-header">
+      <div class="q-badge">${q.num}</div>
+      <p class="q-text">${q.text}</p>
+    </div>
+    ${body}
+    <div class="bottom">
+      ${!auto ? `<button class="btn btn-primary" onclick="goNext()" ${ok?'':'disabled'}>${isLast?'Continuar →':'Aceptar'}</button>` : '<div></div>'}
+      <div class="nav-arrows">
+        <button class="nav-btn" onclick="goBack()" ${step<=1?'disabled':''} title="Anterior">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+        ${!auto ? `<button class="nav-btn" onclick="goNext()" ${ok?'':'disabled'} title="Siguiente">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderLegal() {
+  return `
+    <h2 class="section-title">Casi listo</h2>
+    <p class="section-sub">Antes de compartir tus datos necesitamos tu consentimiento.</p>
+    <div class="legal-box">
+      Los datos que nos facilites serán tratados por EFEIA para el análisis de tus hábitos tecnológicos y el envío de tu confirmación. Puedes ejercer tus derechos de acceso, rectificación y supresión contactando con nosotros.
+    </div>
+    <label class="check-label">
+      <input type="checkbox" id="legalChk" ${legalOk?'checked':''} onchange="toggleLegal(this.checked)">
+      <span>Acepto los términos legales y el tratamiento de mis datos personales por parte de EFEIA.</span>
+    </label>
+    <div class="bottom">
+      <button class="btn btn-primary" id="legalBtn" onclick="goNext()" ${legalOk?'':'disabled'}>Continuar</button>
+      <div class="nav-arrows">
+        <button class="nav-btn" onclick="goBack()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderContact() {
+  const c = contact;
+  return `
+    <h2 class="section-title">¿A dónde enviamos la confirmación?</h2>
+    <p class="section-sub">Recibirás un email confirmando tus respuestas.</p>
+    <div class="form-row">
+      <label>Nombre</label>
+      <input type="text" placeholder="Tu nombre" value="${esc(c.nombre)}" oninput="updC('nombre',this.value)" autocomplete="given-name">
+    </div>
+    <div class="form-row">
+      <label>Email</label>
+      <input type="email" placeholder="tu@email.com" value="${esc(c.email)}" oninput="updC('email',this.value)" autocomplete="email" inputmode="email">
+    </div>
+    <div class="form-row">
+      <label>WhatsApp <span class="opt">(opcional)</span></label>
+      <input type="tel" placeholder="+34 600 000 000" value="${esc(c.whatsapp)}" oninput="updC('whatsapp',this.value)" autocomplete="tel" inputmode="tel">
+    </div>
+    <div class="bottom">
+      <button class="btn btn-primary" id="submitBtn" onclick="submitForm()" ${contactValid()?'':'disabled'}>
+        ${submitting ? 'Enviando…' : 'Enviar respuestas →'}
+      </button>
+      <div class="nav-arrows">
+        <button class="nav-btn" onclick="goBack()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderThanks() {
+  return `
+    <div class="thanks-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3B49DF" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <p class="thanks-title">¡Cuestionario completado!</p>
+    <p class="thanks-text">
+      Gracias, <strong>${esc(contact.nombre)}</strong>. Hemos recibido tus respuestas.<br><br>
+      En breve recibirás un email de confirmación en <strong>${esc(contact.email)}</strong>.
+    </p>
+    <div class="thanks-card">
+      <div class="thanks-card-tag">EFEIA · Cuestionario A · Hábitos Tecnológicos</div>
+      <p class="thanks-card-text">Este cuestionario forma parte del protocolo de evaluación de hábitos electromagnéticos de EFEIA. Si tienes dudas, contacta con nosotros.</p>
+    </div>`;
+}
+
+draw();
+</script>
+</body>
+</html>

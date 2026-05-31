@@ -1,19 +1,12 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "form/ekio-diagnostico-v5.html",
-      "use": "@vercel/static"
-    }
+    { "src": "form/ekio-diagnostico-v5.html",   "use": "@vercel/static" },
+    { "src": "form/efeia-cuestionario-a.html",  "use": "@vercel/static" }
   ],
   "routes": [
-    {
-      "src": "/",
-      "dest": "/form/ekio-diagnostico-v5.html"
-    },
-    {
-      "src": "/diagnostico",
-      "dest": "/form/ekio-diagnostico-v5.html"
-    }
+    { "src": "/",              "dest": "/form/ekio-diagnostico-v5.html" },
+    { "src": "/diagnostico",   "dest": "/form/ekio-diagnostico-v5.html" },
+    { "src": "/cuestionario-a","dest": "/form/efeia-cuestionario-a.html" }
   ]
 }
