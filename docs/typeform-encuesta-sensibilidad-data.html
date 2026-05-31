@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datos Typeform — Encuesta Sensibilidad EM · EKIO</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F8F9FA; color: #1A1A2E; line-height: 1.5; padding: 32px 16px 60px; }
+    .container { max-width: 900px; margin: 0 auto; }
+
+    /* Header */
+    .header { margin-bottom: 32px; }
+    .header-tag { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #3B49DF; margin-bottom: 8px; }
+    .header h1 { font-size: 1.85rem; font-weight: 700; color: #111827; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .header p { font-size: 0.9rem; color: #6B7280; }
+
+    /* KPI Cards */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 32px; }
+    .kpi-card { background: #fff; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .kpi-label { font-size: 0.75rem; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .kpi-value { font-size: 1.9rem; font-weight: 700; color: #111827; letter-spacing: -0.03em; }
+    .kpi-card.highlight .kpi-value { color: #3B49DF; }
+    .kpi-sub { font-size: 0.78rem; color: #9CA3AF; margin-top: 2px; }
+
+    /* Section */
+    .section { background: #fff; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 28px; }
+    .section-header { padding: 20px 24px 16px; border-bottom: 1px solid #F3F4F6; }
+    .section-header h2 { font-size: 1rem; font-weight: 700; color: #111827; }
+    .section-header p { font-size: 0.83rem; color: #6B7280; margin-top: 3px; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; }
+    thead th { padding: 10px 16px; font-size: 0.73rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9CA3AF; text-align: left; border-bottom: 1px solid #F3F4F6; }
+    tbody tr:hover { background: #FAFAFA; }
+    td { padding: 11px 16px; font-size: 0.88rem; color: #374151; border-bottom: 1px solid #F9FAFB; vertical-align: middle; }
+    td.num { font-weight: 600; color: #111827; text-align: right; font-variant-numeric: tabular-nums; }
+    td.q-label { max-width: 340px; color: #374151; }
+    td.q-num { width: 32px; font-size: 0.75rem; font-weight: 700; color: #9CA3AF; text-align: center; }
+    td.category { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* Drop-off bar */
+    .bar-cell { width: 140px; padding-right: 20px; }
+    .bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .bar-bg { flex: 1; height: 6px; background: #F3F4F6; border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; }
+    .bar-pct { font-size: 0.78rem; font-weight: 600; min-width: 36px; text-align: right; }
+
+    /* Alert row */
+    tr.alert-row td { background: #FFF8F0; }
+    tr.alert-row .bar-fill { background: #F59E0B; }
+    tr.alert-row .bar-pct { color: #B45309; }
+    tr.normal-row .bar-fill { background: #10B981; }
+    tr.normal-row .bar-pct { color: #059669; }
+    tr.medium-row .bar-fill { background: #F97316; }
+    tr.medium-row .bar-pct { color: #C2410C; }
+    tr.contact-row td { background: #F0F4FF; }
+    tr.contact-row .bar-fill { background: #6366F1; }
+    tr.contact-row .bar-pct { color: #4338CA; }
+
+    /* Insights */
+    .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; padding: 20px 24px; }
+    .insight-card { background: #F8F9FF; border: 1px solid #E0E3FF; border-radius: 10px; padding: 16px; }
+    .insight-card.warning { background: #FFFBEB; border-color: #FDE68A; }
+    .insight-card.success { background: #F0FDF4; border-color: #BBF7D0; }
+    .insight-tag { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6366F1; margin-bottom: 6px; }
+    .insight-card.warning .insight-tag { color: #D97706; }
+    .insight-card.success .insight-tag { color: #16A34A; }
+    .insight-title { font-size: 0.92rem; font-weight: 700; color: #111827; margin-bottom: 4px; }
+    .insight-text { font-size: 0.83rem; color: #4B5563; line-height: 1.55; }
+
+    /* Footer */
+    .footer { text-align: center; font-size: 0.78rem; color: #9CA3AF; margin-top: 40px; }
+
+    @media (max-width: 600px) {
+      .bar-cell { display: none; }
+      td.q-label { font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-tag">EKIO Electrosmog · Typeform · Exportación de datos</div>
+    <h1>Encuesta de Valoración de Sensibilidad Electromagnética</h1>
+    <p>Datos históricos extraídos de Typeform antes del cierre. Fuente de verdad para contenido editorial y lecciones aprendidas.</p>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Vistas totales</div>
+      <div class="kpi-value">12.699</div>
+      <div class="kpi-sub">Personas que vieron la encuesta</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Inicios</div>
+      <div class="kpi-value">7.236</div>
+      <div class="kpi-sub">57% de los que la vieron</div>
+    </div>
+    <div class="kpi-card highlight">
+      <div class="kpi-label">Envíos completos</div>
+      <div class="kpi-value">2.284</div>
+      <div class="kpi-sub">Respuestas procesables</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tasa de completado</div>
+      <div class="kpi-value">31,6%</div>
+      <div class="kpi-sub">Sobre los que iniciaron</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tiempo medio</div>
+      <div class="kpi-value">3:41</div>
+      <div class="kpi-sub">min · quien completa</div>
+    </div>
+  </div>
+
+  <!-- Question by question -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Pregunta a pregunta — Vistas y abandono</h2>
+      <p>Cada fila muestra cuántas personas llegaron y cuántas abandonaron en esa pregunta. Verde = abandono bajo (&lt;3%), naranja = medio (3-10%), amarillo = alto (&gt;10%).</p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:32px">#</th>
+          <th>Pregunta</th>
+          <th style="text-align:right">Vistas</th>
+          <th style="text-align:right">Abandonos</th>
+          <th class="bar-cell">Tasa abandono</th>
+          <th>Categoría</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- Welcome -->
+        <tr class="alert-row">
+          <td class="q-num">—</td>
+          <td class="q-label"><strong>Pantalla de bienvenida / Intro</strong></td>
+          <td class="num">12.699</td>
+          <td class="num" style="color:#B45309">−5.504</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:43%"></div></div><span class="bar-pct">43%</span></div></td>
+          <td class="category" style="color:#B45309">Entrada</td>
+        </tr>
+
+        <!-- Q1 Fatiga — MAYOR ABANDONO -->
+        <tr class="alert-row">
+          <td class="q-num">1</td>
+          <td class="q-label">¿En qué medida experimentas <strong>fatiga</strong> (cansancio general)?</td>
+          <td class="num">7.195</td>
+          <td class="num" style="color:#B45309">−3.410</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:47%"></div></div><span class="bar-pct">47%</span></div></td>
+          <td class="category" style="color:#B45309">Energía ⚠</td>
+        </tr>
+
+        <tr class="medium-row">
+          <td class="q-num">2</td>
+          <td class="q-label">¿Con qué frecuencia experimentas problemas para dormir o <strong>insomnio</strong>?</td>
+          <td class="num">3.785</td>
+          <td class="num" style="color:#C2410C">−249</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:7%"></div></div><span class="bar-pct">7%</span></div></td>
+          <td class="category" style="color:#C2410C">Sueño</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">3</td>
+          <td class="q-label">¿Has notado que <strong>duermes en exceso</strong>?</td>
+          <td class="num">3.536</td>
+          <td class="num" style="color:#059669">−75</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:2%"></div></div><span class="bar-pct">2%</span></div></td>
+          <td class="category" style="color:#059669">Sueño</td>
+        </tr>
+
+        <tr class="medium-row">
+          <td class="q-num">4</td>
+          <td class="q-label">¿Cuánto te afecta la <strong>irritabilidad</strong> a tu bienestar?</td>
+          <td class="num">3.461</td>
+          <td class="num" style="color:#C2410C">−110</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:3%"></div></div><span class="bar-pct">3%</span></div></td>
+          <td class="category" style="color:#C2410C">Emocional</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">5</td>
+          <td class="q-label">¿Hasta qué punto sientes <strong>nerviosismo</strong>?</td>
+          <td class="num">3.351</td>
+          <td class="num" style="color:#059669">−45</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div></td>
+          <td class="category" style="color:#059669">Emocional</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">6</td>
+          <td class="q-label">¿Has experimentado problemas en la <strong>piel</strong> (erupciones, picazón)?</td>
+          <td class="num">3.306</td>
+          <td class="num" style="color:#059669">−24</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div></td>
+          <td class="category" style="color:#059669">Piel</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">7</td>
+          <td class="q-label">¿Cuánto te afecta un ritmo anormal del corazón o <strong>taquicardia</strong>?</td>
+          <td class="num">3.282</td>
+          <td class="num" style="color:#059669">−41</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div></td>
+          <td class="category" style="color:#059669">Cardiovascular</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">8</td>
+          <td class="q-label">¿Has experimentado problemas de <strong>presión arterial</strong>?</td>
+          <td class="num">3.241</td>
+          <td class="num" style="color:#059669">−23</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div></td>
+          <td class="category" style="color:#059669">Cardiovascular</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">9</td>
+          <td class="q-label">¿Has notado síntomas de <strong>colon irritable</strong>?</td>
+          <td class="num">3.218</td>
+          <td class="num" style="color:#059669">−14</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Digestivo</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">10</td>
+          <td class="q-label">¿Has experimentado <strong>pérdida auditiva</strong>?</td>
+          <td class="num">3.204</td>
+          <td class="num" style="color:#059669">−9</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Auditivo</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">11</td>
+          <td class="q-label">¿Sientes <strong>dolor en los oídos</strong>?</td>
+          <td class="num">3.195</td>
+          <td class="num" style="color:#059669">−10</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Auditivo</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">12</td>
+          <td class="q-label">¿Experimentas <strong>zumbidos o tinnitus</strong> en los oídos?</td>
+          <td class="num">3.185</td>
+          <td class="num" style="color:#059669">−13</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Auditivo</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">13</td>
+          <td class="q-label">¿Has experimentado <strong>dolor en las cejas</strong>?</td>
+          <td class="num">3.172</td>
+          <td class="num" style="color:#059669">−10</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Neurológico</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">14</td>
+          <td class="q-label">¿En qué medida te afecta la <strong>visión borrosa</strong>?</td>
+          <td class="num">3.162</td>
+          <td class="num" style="color:#059669">−3</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Visual</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">15</td>
+          <td class="q-label">¿Cuánto nivel de <strong>mareo</strong> experimentas?</td>
+          <td class="num">3.159</td>
+          <td class="num" style="color:#059669">−16</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div></td>
+          <td class="category" style="color:#059669">Neurológico</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">16</td>
+          <td class="q-label">¿Has notado problemas de <strong>concentración</strong>?</td>
+          <td class="num">3.143</td>
+          <td class="num" style="color:#059669">−13</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Neurológico</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">17</td>
+          <td class="q-label">¿Has experimentado problemas de <strong>memoria</strong> a corto plazo?</td>
+          <td class="num">3.130</td>
+          <td class="num" style="color:#059669">−14</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Neurológico</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">18</td>
+          <td class="q-label">¿Has tenido <strong>dolores de cabeza</strong>?</td>
+          <td class="num">3.116</td>
+          <td class="num" style="color:#059669">0</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Neurológico</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">19</td>
+          <td class="q-label">¿Has experimentado <strong>enrojecimiento o inflamación facial</strong>?</td>
+          <td class="num">3.117</td>
+          <td class="num" style="color:#059669">−6</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Facial</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">20</td>
+          <td class="q-label">¿Sientes una sensación de <strong>calor en el rostro</strong>?</td>
+          <td class="num">3.111</td>
+          <td class="num" style="color:#059669">−6</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Facial</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">21</td>
+          <td class="q-label">¿Has sentido <strong>presión o adormecimiento en la cabeza</strong>?</td>
+          <td class="num">3.105</td>
+          <td class="num" style="color:#059669">−18</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div></td>
+          <td class="category" style="color:#059669">Neurológico</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">22</td>
+          <td class="q-label">¿Has experimentado <strong>banda apretada alrededor de la cabeza</strong>?</td>
+          <td class="num">3.087</td>
+          <td class="num" style="color:#059669">−7</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Neurológico</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">23</td>
+          <td class="q-label">¿Has sentido <strong>pinchazos en la piel</strong>?</td>
+          <td class="num">3.080</td>
+          <td class="num" style="color:#059669">−9</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Piel</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">24</td>
+          <td class="q-label">¿Has experimentado <strong>presión en el pecho</strong>?</td>
+          <td class="num">3.071</td>
+          <td class="num" style="color:#059669">−11</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Cardiovascular</td>
+        </tr>
+
+        <tr class="normal-row">
+          <td class="q-num">25</td>
+          <td class="q-label">¿Has sentido <strong>falta de oxígeno</strong>?</td>
+          <td class="num">3.060</td>
+          <td class="num" style="color:#059669">−15</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div><span class="bar-pct">0%</span></div></td>
+          <td class="category" style="color:#059669">Cardiovascular</td>
+        </tr>
+
+        <!-- Contact fields -->
+        <tr class="contact-row alert-row">
+          <td class="q-num">—</td>
+          <td class="q-label"><strong>Captura de email</strong> — "¿Dónde te enviamos los resultados?"</td>
+          <td class="num">3.045</td>
+          <td class="num" style="color:#4338CA">−595</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:20%"></div></div><span class="bar-pct">20%</span></div></td>
+          <td class="category" style="color:#4338CA">Contacto ⚠</td>
+        </tr>
+
+        <tr class="contact-row medium-row">
+          <td class="q-num">—</td>
+          <td class="q-label">Acepto los términos legales</td>
+          <td class="num">2.450</td>
+          <td class="num" style="color:#C2410C">−75</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:3%"></div></div><span class="bar-pct">3%</span></div></td>
+          <td class="category" style="color:#4338CA">Legal</td>
+        </tr>
+
+        <tr class="contact-row normal-row">
+          <td class="q-num">—</td>
+          <td class="q-label">Nombre</td>
+          <td class="num">2.375</td>
+          <td class="num" style="color:#059669">−31</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div></td>
+          <td class="category" style="color:#4338CA">Contacto</td>
+        </tr>
+
+        <tr class="contact-row normal-row">
+          <td class="q-num">—</td>
+          <td class="q-label">Ciudad de residencia</td>
+          <td class="num">2.344</td>
+          <td class="num" style="color:#059669">−24</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div><span class="bar-pct">1%</span></div></td>
+          <td class="category" style="color:#4338CA">Contacto</td>
+        </tr>
+
+        <tr class="contact-row normal-row">
+          <td class="q-num">—</td>
+          <td class="q-label">WhatsApp (opcional)</td>
+          <td class="num">987</td>
+          <td class="num" style="color:#059669">−53</td>
+          <td class="bar-cell"><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:5%"></div></div><span class="bar-pct">5%</span></div></td>
+          <td class="category" style="color:#4338CA">Contacto</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Insights -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Lecciones aprendidas y señales editoriales</h2>
+      <p>Inferencias directas de los datos de comportamiento de 12.699 personas.</p>
+    </div>
+    <div class="insights-grid">
+
+      <div class="insight-card warning">
+        <div class="insight-tag">Fricción crítica #1</div>
+        <div class="insight-title">La primera pregunta pierde al 47%</div>
+        <div class="insight-text">De los 7.236 que inician, 3.410 abandonan en la primera pregunta (fatiga). El salto de "ver la intro" a "responder la primera" es el mayor punto de fuga. Implicación: la intro no crea suficiente motivación o la primera pregunta genera resistencia.</div>
+      </div>
+
+      <div class="insight-card warning">
+        <div class="insight-tag">Fricción crítica #2</div>
+        <div class="insight-title">El email cuesta 595 personas (20%)</div>
+        <div class="insight-text">Después de 25 preguntas respondidas, 595 personas se niegan a dar el email. Es el segundo mayor punto de abandono. Señal: hay desconfianza o la promesa de valor ("recibirás tu puntuación") no es suficientemente poderosa en ese momento.</div>
+      </div>
+
+      <div class="insight-card success">
+        <div class="insight-tag">Comportamiento positivo</div>
+        <div class="insight-title">Una vez en la Q2, casi nadie se va</div>
+        <div class="insight-text">Desde la pregunta 2 hasta la 25, el abandono es 0-3% por pregunta. Quien pasa de la primera pregunta está altamente comprometido. La longitud del cuestionario (25 preguntas) no es problema una vez superada la barrera inicial.</div>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-tag">Señal de audiencia</div>
+        <div class="insight-title">La fatiga es el síntoma más universal</div>
+        <div class="insight-text">Es la primera pregunta elegida y la que más impacto tiene en el abandono. Sugiere que la fatiga es el síntoma con el que más se identifica la audiencia. Contenido editorial sobre "fatiga + electrosmog" tiene alto potencial de resonancia.</div>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-tag">Señal de audiencia</div>
+        <div class="insight-title">Neurológico y sueño: síntomas estrella</div>
+        <div class="insight-text">Las categorías con más preguntas son neurológico (7 síntomas) y sueño (2). Las personas que completan la encuesta responden a todos. Contenido sobre concentración, memoria, insomnio y dolores de cabeza conecta con este perfil.</div>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-tag">Señal de audiencia</div>
+        <div class="insight-title">WhatsApp: solo 987 de 2.344 lo dan</div>
+        <div class="insight-text">El 42% de quienes llegan al final optan por no dar el WhatsApp (campo opcional). Indica resistencia a la mensajería directa. En el nuevo formulario, el opt-in explícito y el WhatsApp Business son claves para justificar ese paso.</div>
+      </div>
+
+      <div class="insight-card warning">
+        <div class="insight-tag">Oportunidad de mejora</div>
+        <div class="insight-title">43% abandona en la bienvenida</div>
+        <div class="insight-text">12.699 vieron el formulario pero 5.504 no empezaron ni una pregunta. Causas probables: carga lenta, diseño poco atractivo, expectativas no alineadas, o tráfico de baja intención. El nuevo HTML con diseño Typeform y carga instantánea debería reducir esto.</div>
+      </div>
+
+      <div class="insight-card success">
+        <div class="insight-tag">Validación de producto</div>
+        <div class="insight-title">2.284 leads cualificados generados</div>
+        <div class="insight-text">2.284 personas completaron nombre, email, ciudad y consintieron el tratamiento de datos. Son leads con alta intención — tardaron 3:41 min respondiendo preguntas sobre sus síntomas. Segmento ideal para flujos de Klaviyo con contenido específico por perfil EHS.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Resumen categorías -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Distribución de síntomas por categoría</h2>
+      <p>Agrupación de las 25 preguntas según área corporal/funcional. Base para estructura de contenido editorial.</p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th style="text-align:right">Nº preguntas</th>
+          <th>Síntomas incluidos</th>
+          <th style="text-align:right">Potencial editorial</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Neurológico</strong></td><td class="num">7</td><td style="font-size:0.82rem;color:#6B7280">Dolor cejas, visión borrosa, mareo, concentración, memoria, dolor cabeza, presión cabeza, banda cabeza</td><td class="num" style="color:#3B49DF">Alto</td></tr>
+        <tr><td><strong>Sueño / Energía</strong></td><td class="num">3</td><td style="font-size:0.82rem;color:#6B7280">Fatiga, insomnio, sueño exceso</td><td class="num" style="color:#3B49DF">Muy alto</td></tr>
+        <tr><td><strong>Cardiovascular</strong></td><td class="num">4</td><td style="font-size:0.82rem;color:#6B7280">Taquicardia, presión arterial, presión pecho, falta oxígeno</td><td class="num" style="color:#F59E0B">Medio</td></tr>
+        <tr><td><strong>Emocional</strong></td><td class="num">2</td><td style="font-size:0.82rem;color:#6B7280">Irritabilidad, nerviosismo</td><td class="num" style="color:#3B49DF">Alto</td></tr>
+        <tr><td><strong>Auditivo</strong></td><td class="num">3</td><td style="font-size:0.82rem;color:#6B7280">Pérdida auditiva, dolor oídos, tinnitus</td><td class="num" style="color:#F59E0B">Medio</td></tr>
+        <tr><td><strong>Piel</strong></td><td class="num">2</td><td style="font-size:0.82rem;color:#6B7280">Erupciones/picazón, pinchazos</td><td class="num" style="color:#F59E0B">Medio</td></tr>
+        <tr><td><strong>Facial</strong></td><td class="num">2</td><td style="font-size:0.82rem;color:#6B7280">Enrojecimiento, calor rostro</td><td class="num" style="color:#9CA3AF">Bajo</td></tr>
+        <tr><td><strong>Digestivo</strong></td><td class="num">1</td><td style="font-size:0.82rem;color:#6B7280">Colon irritable</td><td class="num" style="color:#9CA3AF">Bajo</td></tr>
+        <tr><td><strong>Visual</strong></td><td class="num">1</td><td style="font-size:0.82rem;color:#6B7280">Visión borrosa</td><td class="num" style="color:#9CA3AF">Bajo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    Exportado el 31/05/2026 · Fuente: Typeform — Encuesta de Valoración de Sensibilidad Electromagnética · EKIO Electrosmog<br>
+    Conservar este archivo antes de dar de baja la cuenta Typeform.
+  </div>
+
+</div>
+</body>
+</html>
