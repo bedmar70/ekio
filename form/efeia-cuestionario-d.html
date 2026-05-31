@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cuestionario D — Percepción EM · EFEIA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --blue:#3B49DF; --blue-dk:#2A37C8; --text:#111827; --muted:#6B7280; --border:#E5E7EB; --bg-page:#F3F4F6; --bg-card:#FFFFFF; --radius:16px; }
+    html, body { height: 100%; background: var(--bg-page); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .page { display:flex; flex-direction:column; padding:24px 16px 40px; max-width:600px; margin:0 auto; }
+    .page-title { font-size:2rem; font-weight:700; color:var(--text); letter-spacing:-0.03em; line-height:1.1; margin-bottom:20px; }
+    .card { background:var(--bg-card); border-radius:var(--radius); box-shadow:0 2px 8px rgba(0,0,0,0.07),0 0 1px rgba(0,0,0,0.06); overflow:hidden; }
+    .progress-bar { height:3px; background:var(--border); }
+    .progress-fill { height:100%; background:var(--blue); transition:width 0.45s cubic-bezier(0.4,0,0.2,1); }
+    .screen { display:flex; flex-direction:column; padding:28px 24px 24px; }
+    .welcome-logo { display:flex; align-items:center; gap:8px; margin-bottom:24px; }
+    .welcome-logo span { font-size:0.95rem; font-weight:700; color:var(--text); letter-spacing:0.04em; }
+    .welcome-desc { font-size:0.97rem; color:var(--muted); line-height:1.7; margin-bottom:24px; }
+    .welcome-meta { font-size:0.82rem; color:var(--muted); display:flex; align-items:center; gap:6px; margin-top:12px; }
+    .q-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:20px; }
+    .q-badge { width:28px; height:28px; min-width:28px; background:var(--blue); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:700; color:#fff; margin-top:2px; }
+    .q-text { font-size:1.05rem; font-weight:500; color:var(--text); line-height:1.55; flex:1; }
+    /* Scale 0-10 */
+    .scale-labels { display:flex; justify-content:space-between; font-size:0.72rem; color:var(--muted); margin-bottom:8px; }
+    .rating-row { display:flex; gap:6px; margin-bottom:6px; }
+    .r-btn { flex:1; height:54px; border:1.5px solid var(--border); border-radius:10px; background:#F9FAFB; font-family:inherit; font-size:1rem; font-weight:500; color:var(--text); cursor:pointer; transition:border-color 0.12s,background 0.12s,color 0.12s,transform 0.08s; -webkit-tap-highlight-color:transparent; user-select:none; }
+    .r-btn:active { transform:scale(0.92); }
+    .r-btn.selected { background:var(--blue); border-color:var(--blue); color:#fff; font-weight:600; }
+    .r-btn.pulse { animation:pulse-select 0.22s ease; }
+    @keyframes pulse-select { 0%{transform:scale(1)} 50%{transform:scale(0.85)} 100%{transform:scale(1)} }
+    /* Radio options */
+    .opt-list { display:flex; flex-direction:column; gap:8px; }
+    .opt-item { display:flex; align-items:center; gap:12px; padding:14px; border:1.5px solid var(--border); border-radius:10px; background:#F9FAFB; cursor:pointer; transition:border-color 0.12s,background 0.12s; font-size:0.95rem; color:var(--text); -webkit-tap-highlight-color:transparent; user-select:none; }
+    .opt-item.selected { background:#EEF0FD; border-color:var(--blue); color:var(--blue); font-weight:600; }
+    .opt-marker { width:20px; height:20px; min-width:20px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .opt-item.selected .opt-marker { border-color:var(--blue); background:var(--blue); }
+    .opt-dot { width:8px; height:8px; border-radius:50%; background:#fff; }
+    /* Bottom */
+    .bottom { margin-top:20px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-arrows { display:flex; gap:6px; }
+    .nav-btn { width:44px; height:44px; border-radius:10px; border:1.5px solid var(--border); background:#F9FAFB; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; transition:background 0.12s; color:var(--muted); }
+    .nav-btn:hover { background:var(--border); }
+    .nav-btn:disabled { opacity:0.3; cursor:not-allowed; }
+    .btn { display:inline-flex; align-items:center; gap:6px; padding:0.85rem 1.75rem; border-radius:10px; font-family:inherit; font-size:0.975rem; font-weight:600; cursor:pointer; transition:background 0.15s,opacity 0.15s,transform 0.1s; -webkit-tap-highlight-color:transparent; border:none; white-space:nowrap; }
+    .btn:active:not(:disabled) { transform:scale(0.97); }
+    .btn-primary { background:var(--blue); color:#fff; }
+    .btn-primary:hover:not(:disabled) { background:var(--blue-dk); }
+    .btn-primary:disabled { opacity:0.35; cursor:not-allowed; }
+    .section-title { font-size:1.45rem; font-weight:700; color:var(--text); letter-spacing:-0.02em; margin-bottom:6px; }
+    .section-sub { font-size:0.9rem; color:var(--muted); line-height:1.6; margin-bottom:20px; }
+    .legal-box { background:#F9FAFB; border:1px solid var(--border); border-radius:10px; padding:16px; font-size:0.84rem; color:var(--muted); line-height:1.65; margin-bottom:20px; }
+    .check-label { display:flex; align-items:flex-start; gap:12px; cursor:pointer; margin-bottom:24px; }
+    .check-label input[type="checkbox"] { width:20px; height:20px; min-width:20px; flex-shrink:0; margin-top:1px; accent-color:var(--blue); cursor:pointer; }
+    .check-label span { font-size:0.9rem; color:var(--text); line-height:1.55; }
+    .form-row { margin-bottom:14px; }
+    .form-row label { display:block; font-size:0.82rem; font-weight:600; color:var(--text); margin-bottom:5px; }
+    .form-row .opt { font-weight:400; color:var(--muted); }
+    .form-row input { width:100%; padding:0.85rem 1rem; border:1.5px solid var(--border); border-radius:10px; font-family:inherit; font-size:0.975rem; color:var(--text); background:var(--bg-card); transition:border-color 0.18s; -webkit-appearance:none; outline:none; }
+    .form-row input:focus { border-color:var(--blue); }
+    .form-row input::placeholder { color:#C4C9D4; }
+    .thanks-icon { width:64px; height:64px; border-radius:50%; background:#EEF0FD; display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
+    .thanks-title { font-size:1.5rem; font-weight:700; color:var(--text); letter-spacing:-0.02em; margin-bottom:10px; }
+    .thanks-text { font-size:0.95rem; color:var(--muted); line-height:1.7; margin-bottom:28px; }
+    .thanks-text strong { color:var(--text); }
+    .thanks-card { background:#F0F1FD; border-radius:12px; padding:20px; }
+    .thanks-card-tag { font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--blue); margin-bottom:6px; }
+    .thanks-card-text { font-size:0.88rem; color:#374151; line-height:1.6; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <h1 class="page-title" id="pageTitle">Cuestionario D</h1>
+  <div class="card">
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    <div class="screen" id="screen"></div>
+  </div>
+</div>
+<script>
+const N8N_WEBHOOK = 'https://crm-ekio-n8n.idv05l.easypanel.host/webhook/efeia-cuestionario-d';
+
+// type: 'scale' = 0-10 buttons; 'radio' = clickable options
+const QUESTIONS = [
+  { key:'preocupacion_em', type:'scale',
+    text:'Desde que te enteraste de los daños que causan las radiaciones electromagnéticas, ¿cuánto te preocupas por tu salud por esta causa?',
+    labelMin:'Nada', labelMax:'Mucho' },
+
+  { key:'mayor_dano', type:'radio',
+    text:'¿Cuál de estos sientes que te hace más daño?',
+    opts:[
+      { v:'telefono', l:'El teléfono celular' },
+      { v:'todos',    l:'Todos los anteriores (teléfono, wifi, antenas, etc.)' }
+    ]},
+
+  { key:'malestar_telefono_apagado', type:'scale',
+    text:'Si tomas el teléfono en tus manos, aunque esté apagado, ¿sientes malestar, ansiedad u otra cosa?',
+    labelMin:'Para nada', labelMax:'Demasiado' },
+
+  { key:'rechazo_antena', type:'scale',
+    text:'Cuando ves una antena de teléfono móvil en una imagen, ¿sientes rechazo o incomodidad?',
+    labelMin:'Para nada', labelMax:'Demasiado' },
+
+  { key:'rechazo_router_apagado', type:'scale',
+    text:'Si estás frente a un router Wi-Fi apagado y te acercas a él, ¿sientes rechazo o incomodidad?',
+    labelMin:'Para nada', labelMax:'Demasiado' },
+
+  { key:'molestia_persona_telefono', type:'scale',
+    text:'Cuando ves a alguien hablando por teléfono, ¿cuánta molestia te causa?',
+    labelMin:'Para nada', labelMax:'Demasiado' },
+];
+
+let step = 0;
+let answers = {};
+let contact = { nombre:'', email:'', whatsapp:'' };
+let legalOk = false;
+let submitting = false;
+const TOTAL = QUESTIONS.length + 3;
+
+function progress() {
+  if (step === 0) return 0;
+  if (step >= TOTAL) return 100;
+  return Math.round((step / TOTAL) * 100);
+}
+function contactValid() { return contact.nombre.trim() && contact.email.trim() && contact.email.includes('@'); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function isAnswered(q) { const a = answers[q.key]; return a !== undefined && a !== ''; }
+
+function pickScale(key, val) {
+  answers[key] = val;
+  draw();
+  setTimeout(() => { step++; draw(); }, 280);
+}
+function pickRadio(key, val) {
+  answers[key] = val;
+  draw();
+  setTimeout(() => { step++; draw(); }, 220);
+}
+function goBack() { if (step > 0) { step--; draw(); } }
+function updC(f, v) { contact[f] = v; const b = document.getElementById('submitBtn'); if(b) b.disabled = !contactValid(); }
+function toggleLegal(v) { legalOk = v; const b = document.getElementById('legalBtn'); if(b) b.disabled = !legalOk; }
+
+async function submitForm() {
+  if (submitting || !contactValid()) return;
+  submitting = true; draw();
+  try {
+    await fetch(N8N_WEBHOOK, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ ...contact, respuestas: answers, fecha: new Date().toISOString() })
+    });
+  } catch(e) { console.warn(e); }
+  step = TOTAL + 1; draw();
+}
+
+function draw() {
+  document.getElementById('pFill').style.width = progress() + '%';
+  document.getElementById('pageTitle').textContent = step >= TOTAL ? '¡Gracias!' : 'Cuestionario D';
+  let h = '';
+  if      (step === 0)                         h = renderWelcome();
+  else if (step >= 1 && step <= QUESTIONS.length) h = renderQ(step - 1);
+  else if (step === QUESTIONS.length + 1)      h = renderLegal();
+  else if (step === QUESTIONS.length + 2)      h = renderContact();
+  else                                         h = renderThanks();
+  document.getElementById('screen').innerHTML = h;
+  window.scrollTo(0,0);
+}
+
+function renderWelcome() {
+  return `
+    <div class="welcome-logo">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="7" fill="#3B49DF"/><path d="M7 9h14M7 14h10M7 19h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>EFEIA</span>
+    </div>
+    <p class="welcome-desc">
+      <strong>Cuestionario D — Percepción Electromagnética</strong><br><br>
+      Responde con sinceridad. Las escalas van de <strong>0</strong> (para nada) a <strong>10</strong> (demasiado).<br><br>
+      No hay respuestas correctas ni incorrectas.
+    </p>
+    <div class="bottom" style="flex-direction:column;gap:10px;align-items:flex-start;">
+      <button class="btn btn-primary" onclick="step++;draw()">Comenzar</button>
+      <div class="welcome-meta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Menos de 2 minutos
+      </div>
+    </div>`;
+}
+
+function renderQ(idx) {
+  const q = QUESTIONS[idx];
+  const ok = isAnswered(q);
+
+  if (q.type === 'scale') {
+    const sel = answers[q.key];
+    const row1 = [0,1,2,3,4,5], row2 = [6,7,8,9,10];
+    const btn = vals => vals.map(v =>
+      `<button class="r-btn${sel===v?' selected':''}" id="rb${v}" onclick="pickScale('${q.key}',${v})">${v}</button>`
+    ).join('');
+    return `
+      <div class="q-header">
+        <div class="q-badge">${idx+1}</div>
+        <p class="q-text">${q.text}</p>
+      </div>
+      <div class="scale-labels"><span>${q.labelMin}</span><span>${q.labelMax}</span></div>
+      <div class="rating-row">${btn(row1)}</div>
+      <div class="rating-row">${btn(row2)}</div>
+      <div class="bottom">
+        <div></div>
+        <div class="nav-arrows">
+          <button class="nav-btn" onclick="goBack()" ${step<=1?'disabled':''}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
+          <button class="nav-btn" onclick="step++;draw()" ${ok?'':'disabled'}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+      </div>`;
+  }
+
+  // radio
+  const sel = answers[q.key];
+  return `
+    <div class="q-header">
+      <div class="q-badge">${idx+1}</div>
+      <p class="q-text">${q.text}</p>
+    </div>
+    <div class="opt-list">
+      ${q.opts.map(o => `
+        <div class="opt-item${sel===o.v?' selected':''}" onclick="pickRadio('${q.key}','${o.v}')">
+          <div class="opt-marker"><div class="opt-dot"></div></div>
+          <span>${esc(o.l)}</span>
+        </div>`).join('')}
+    </div>
+    <div class="bottom">
+      <div></div>
+      <div class="nav-arrows">
+        <button class="nav-btn" onclick="goBack()" ${step<=1?'disabled':''}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderLegal() {
+  return `
+    <h2 class="section-title">Casi listo</h2>
+    <p class="section-sub">Antes de compartir tus datos necesitamos tu consentimiento.</p>
+    <div class="legal-box">Los datos que nos facilites serán tratados por EFEIA para el análisis de tu percepción electromagnética y el envío de tu confirmación.</div>
+    <label class="check-label">
+      <input type="checkbox" id="legalChk" ${legalOk?'checked':''} onchange="toggleLegal(this.checked)">
+      <span>Acepto los términos legales y el tratamiento de mis datos personales por parte de EFEIA.</span>
+    </label>
+    <div class="bottom">
+      <button class="btn btn-primary" id="legalBtn" onclick="step++;draw()" ${legalOk?'':'disabled'}>Continuar</button>
+      <div class="nav-arrows"><button class="nav-btn" onclick="goBack()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg></button></div>
+    </div>`;
+}
+
+function renderContact() {
+  const c = contact;
+  return `
+    <h2 class="section-title">¿A dónde enviamos la confirmación?</h2>
+    <p class="section-sub">Recibirás un email con tus respuestas.</p>
+    <div class="form-row"><label>Nombre</label><input type="text" placeholder="Tu nombre" value="${esc(c.nombre)}" oninput="updC('nombre',this.value)" autocomplete="given-name"></div>
+    <div class="form-row"><label>Email</label><input type="email" placeholder="tu@email.com" value="${esc(c.email)}" oninput="updC('email',this.value)" autocomplete="email" inputmode="email"></div>
+    <div class="form-row"><label>WhatsApp <span class="opt">(opcional)</span></label><input type="tel" placeholder="+34 600 000 000" value="${esc(c.whatsapp)}" oninput="updC('whatsapp',this.value)" autocomplete="tel" inputmode="tel"></div>
+    <div class="bottom">
+      <button class="btn btn-primary" id="submitBtn" onclick="submitForm()" ${contactValid()?'':'disabled'}>${submitting?'Enviando…':'Enviar respuestas →'}</button>
+      <div class="nav-arrows"><button class="nav-btn" onclick="goBack()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg></button></div>
+    </div>`;
+}
+
+function renderThanks() {
+  return `
+    <div class="thanks-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3B49DF" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <p class="thanks-title">¡Cuestionario completado!</p>
+    <p class="thanks-text">Gracias, <strong>${esc(contact.nombre)}</strong>. Hemos recibido tus respuestas.<br><br>En breve recibirás confirmación en <strong>${esc(contact.email)}</strong>.</p>
+    <div class="thanks-card">
+      <div class="thanks-card-tag">EFEIA · Cuestionario D · Percepción Electromagnética</div>
+      <p class="thanks-card-text">Este cuestionario forma parte del protocolo de evaluación de EFEIA.</p>
+    </div>`;
+}
+
+draw();
+</script>
+</body>
+</html>

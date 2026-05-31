@@ -1,0 +1,66 @@
+{
+  "name": "EFEIA — Cuestionario C: Evaluación del Sueño",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "efeia-cuestionario-c", "responseMode": "responseNode", "options": { "allowedOrigins": "*" } },
+      "id": "c3000001-0000-0000-0000-000000000001", "name": "Webhook EFEIA-C",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 1, "position": [-880, 112], "webhookId": "efeia-cuestionario-c"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? $input.first().json;\nconst email    = (body.email    || '').trim();\nconst nombre   = (body.nombre   || '').trim();\nconst whatsapp = (body.whatsapp || '').trim();\nconst respuestas = body.respuestas || {};\nconst fecha    = body.fecha || new Date().toISOString();\n\nconst ccProps = {};\nfor (const [k, v] of Object.entries(respuestas)) ccProps[`cc_${k}`] = v;\n\nconst profileAttributes = { email, first_name: nombre, properties: { ...ccProps, whatsapp } };\nif (whatsapp && whatsapp.length > 4) profileAttributes.phone_number = whatsapp;\n\nconst klaviyoPayload = { data: { type: 'event', attributes: { time: fecha,\n  metric: { data: { type: 'metric', attributes: { name: 'Cuestionario_C_Completado' } } },\n  profile: { data: { type: 'profile', attributes: profileAttributes } },\n  properties: { ...ccProps, nombre }\n}}};\n\nreturn [{ json: { klaviyoPayload, email, nombre } }];"
+      },
+      "id": "c3000001-0000-0000-0000-000000000002", "name": "Preparar payload",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [-656, 112]
+    },
+    {
+      "parameters": {
+        "method": "POST", "url": "https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [
+          { "name": "Authorization", "value": "Klaviyo-API-Key pk_RbTNV3_5531171c992b3c3830cf91ac1758f55374" },
+          { "name": "revision", "value": "2023-10-15" },
+          { "name": "Content-Type", "value": "application/vnd.api+json" },
+          { "name": "Accept", "value": "application/vnd.api+json" }
+        ]},
+        "sendBody": true, "contentType": "raw", "rawContentType": "application/vnd.api+json",
+        "body": "={{ JSON.stringify({ data: { type: 'profile-subscription-bulk-create-job', attributes: { profiles: { data: [{ type: 'profile', attributes: { email: $('Preparar payload').first().json.email, subscriptions: { email: { marketing: { consent: 'SUBSCRIBED' } } } } }] } }, relationships: { list: { data: { type: 'list', id: 'S523PV' } } } } }) }}",
+        "options": { "response": { "response": { "neverError": true } } }
+      },
+      "id": "c3000001-0000-0000-0000-000000000003", "name": "Klaviyo — Suscribir a Lista",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-432, 112]
+    },
+    {
+      "parameters": {
+        "method": "POST", "url": "https://a.klaviyo.com/api/events/",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [
+          { "name": "Authorization", "value": "Klaviyo-API-Key pk_RbTNV3_5531171c992b3c3830cf91ac1758f55374" },
+          { "name": "revision", "value": "2023-10-15" },
+          { "name": "Content-Type", "value": "application/vnd.api+json" },
+          { "name": "Accept", "value": "application/vnd.api+json" }
+        ]},
+        "sendBody": true, "contentType": "raw", "rawContentType": "application/vnd.api+json",
+        "body": "={{ JSON.stringify($('Preparar payload').first().json.klaviyoPayload) }}",
+        "options": { "response": { "response": { "neverError": true } } }
+      },
+      "id": "c3000001-0000-0000-0000-000000000004", "name": "Klaviyo — Crear Evento",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-208, 112]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "{\"status\":\"ok\"}", "options": { "responseCode": 200 } },
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1.5, "position": [16, 112],
+      "id": "c3000001-0000-0000-0000-000000000005", "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook EFEIA-C":          { "main": [[{ "node": "Preparar payload",          "type": "main", "index": 0 }]] },
+    "Preparar payload":         { "main": [[{ "node": "Klaviyo — Suscribir a Lista","type": "main", "index": 0 }]] },
+    "Klaviyo — Suscribir a Lista": { "main": [[{ "node": "Klaviyo — Crear Evento",  "type": "main", "index": 0 }]] },
+    "Klaviyo — Crear Evento":   { "main": [[{ "node": "Respond to Webhook",         "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "8af8ad58ceaa7128317f71b54e3ce8551773f7bea5d95541a73fce3fcaa86443" },
+  "tags": [{ "name": "efeia" }, { "name": "cuestionario-c" }]
+}

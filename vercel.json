@@ -1,12 +1,18 @@
 {
   "version": 2,
   "builds": [
-    { "src": "form/ekio-diagnostico-v5.html",   "use": "@vercel/static" },
-    { "src": "form/efeia-cuestionario-a.html",  "use": "@vercel/static" }
+    { "src": "form/ekio-diagnostico-v5.html",  "use": "@vercel/static" },
+    { "src": "form/efeia-cuestionario-a.html", "use": "@vercel/static" },
+    { "src": "form/efeia-cuestionario-b.html", "use": "@vercel/static" },
+    { "src": "form/efeia-cuestionario-c.html", "use": "@vercel/static" },
+    { "src": "form/efeia-cuestionario-d.html", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/",              "dest": "/form/ekio-diagnostico-v5.html" },
     { "src": "/diagnostico",   "dest": "/form/ekio-diagnostico-v5.html" },
-    { "src": "/cuestionario-a","dest": "/form/efeia-cuestionario-a.html" }
+    { "src": "/cuestionario-a","dest": "/form/efeia-cuestionario-a.html" },
+    { "src": "/cuestionario-b","dest": "/form/efeia-cuestionario-b.html" },
+    { "src": "/cuestionario-c","dest": "/form/efeia-cuestionario-c.html" },
+    { "src": "/cuestionario-d","dest": "/form/efeia-cuestionario-d.html" }
   ]
 }
